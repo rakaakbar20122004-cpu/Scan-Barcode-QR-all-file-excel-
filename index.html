@@ -1,362 +1,704 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Scanner Management System</title>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-dark: #0a0f1d;
-            --sidebar-bg: #070a14;
-            --card-bg: #111726;
-            --accent-blue: #00d2ff;
-            --accent-green: #00e676;
-            --accent-purple: #a855f7;
-            --accent-red: #ff4d4d;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PT DAYA SAKTI NIAGA - Scanner Barcode Otomatis</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+  <style>
+    :root {
+      --bg-dark: #0b1120;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --sidebar-bg: #070d19;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      
+      /* Accent Colors for Neon Glow */
+      --glow-blue: #00d2ff;
+      --glow-green: #00e676;
+      --glow-purple: #a855f7;
+      --glow-red: #ff5252;
+    }
 
-        /* Sidebar Styling */
-        .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            flex-shrink: 0;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        .sidebar-menu {
-            list-style: none;
-            margin-top: 30px;
-        }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-dark) 70%);
+    }
 
-        .sidebar-menu li {
-            margin-bottom: 8px;
-        }
+    /* Sidebar Styling */
+    .sidebar {
+      width: 260px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 20px;
+    }
 
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+    .brand-container {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-        .sidebar-menu a i {
-            margin-right: 12px;
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
+    .brand-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #38bdf8;
+      margin-top: 10px;
+    }
 
-        .sidebar-menu a:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-        }
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
 
-        /* Active Sidebar Item */
-        .sidebar-menu a.active {
-            color: #fff;
-            background: linear-gradient(90deg, rgba(0, 210, 255, 0.15) 0%, rgba(0, 210, 255, 0) 100%);
-            border-left: 3px solid var(--accent-blue);
-        }
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-        /* Main Content Container */
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-            position: relative;
-        }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: var(--text-sub);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
 
-        /* Slide View Logic (Single Page Application) */
-        .tab-slide {
-            display: none; /* Sembunyikan slide secara default */
-            animation: fadeIn 0.3s ease-in-out;
-        }
+    .nav-item:hover, .nav-item.active {
+      background: rgba(56, 189, 248, 0.1);
+      color: #ffffff;
+      border-left: 4px solid #00d2ff;
+    }
 
-        .tab-slide.active {
-            display: block; /* Tampilkan hanya slide aktif */
-        }
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .header-section {
+      margin-bottom: 35px;
+    }
 
-        /* Dashboard Slide Header */
-        .dashboard-header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
+    .header-company {
+      color: #00e676;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
 
-        .dashboard-header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
+    .header-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin: 6px 0;
+      color: #ffffff;
+    }
 
-        /* Card Grid Layout */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
+    .header-desc {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+    }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-            min-height: 280px;
-        }
+    /* Dashboard Grid System */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
 
-        /* Card Borders Highlight */
-        .card.blue { border-color: rgba(0, 210, 255, 0.4); }
-        .card.green { border-color: rgba(0, 230, 118, 0.4); }
-        .card.purple { border-color: rgba(168, 85, 247, 0.4); }
-        .card.red { border-color: rgba(255, 77, 77, 0.4); }
+    /* Card Component with Neon Effect */
+    .menu-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
 
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
+    .menu-card:hover {
+      transform: translateY(-6px);
+    }
 
-        .card.blue .card-icon { color: var(--accent-blue); }
-        .card.green .card-icon { color: var(--accent-green); }
-        .card.purple .card-icon { color: var(--accent-purple); }
-        .card.red .card-icon { color: var(--accent-red); }
+    /* Neon Borders & Glow */
+    .card-blue {
+      border-top: 3px solid var(--glow-blue);
+      box-shadow: 0 -4px 15px rgba(0, 210, 255, 0.25), 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
+    .card-green {
+      border-top: 3px solid var(--glow-green);
+      box-shadow: 0 -4px 15px rgba(0, 230, 118, 0.25), 0 10px 30px rgba(0,0,0,0.4);
+    }
 
-        .card h3 {
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
+    .card-purple {
+      border-top: 3px solid var(--glow-purple);
+      box-shadow: 0 -4px 15px rgba(168, 85, 247, 0.25), 0 10px 30px rgba(0,0,0,0.4);
+    }
 
-        .card p {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
+    .card-red {
+      border-top: 3px solid var(--glow-red);
+      box-shadow: 0 -4px 15px rgba(255, 82, 82, 0.25), 0 10px 30px rgba(0,0,0,0.4);
+    }
 
-        .card-action {
-            background: none;
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-            transition: gap 0.2s;
-        }
+    /* Icon Box with Colored Background */
+    .icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
 
-        .card.blue .card-action { color: var(--accent-blue); }
-        .card.green .card-action { color: var(--accent-green); }
-        .card.purple .card-action { color: var(--accent-purple); }
-        .card.red .card-action { color: var(--accent-red); }
+    .icon-box i {
+      font-size: 1.8rem;
+    }
 
-        .card-action:hover {
-            gap: 10px;
-        }
+    .card-blue .icon-box i { color: #0284c7; }
+    .card-green .icon-box i { color: #16a34a; }
+    .card-purple .icon-box i { color: #9333ea; }
+    .card-red .icon-box i { color: #dc2626; }
 
-        /* Generic Slide Content Boxes */
-        .content-box {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-    </style>
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.4;
+      margin-bottom: 24px;
+      flex-grow: 1;
+    }
+
+    .card-action {
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: gap 0.2s ease;
+    }
+
+    .card-blue .card-action { color: var(--glow-blue); }
+    .card-green .card-action { color: var(--glow-green); }
+    .card-purple .card-action { color: var(--glow-purple); }
+    .card-red .card-action { color: var(--glow-red); }
+
+    .menu-card:hover .card-action {
+      gap: 10px;
+    }
+
+    /* Full Section Boxes */
+    .section-box {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-header {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.9; }
+    .btn-green { background: #10b981; color: #fff; }
+    .btn-red { background: #ef4444; color: #fff; }
+    .btn-wa { background: #25d366; color: #fff; }
+    .btn-blue { background: #3b82f6; color: #fff; }
+
+    /* Flash Scan FX */
+    .flash-active {
+      animation: flash-animation 0.3s ease-out;
+    }
+
+    @keyframes flash-animation {
+      0% { background-color: rgba(0, 210, 255, 0.4); }
+      100% { background-color: transparent; }
+    }
+
+    /* Table Styling */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .data-table th, .data-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .data-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #38bdf8;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+
+    .data-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Toast Notification */
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #00d2ff;
+      color: #000;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      z-index: 999;
+      right: 30px;
+      bottom: 30px;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(0,210,255,0.4);
+    }
+
+    #toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.0s;
+    }
+
+    @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+    @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
+    /* PDF Report Template (Hidden) */
+    #pdfReportTemplate {
+      display: none;
+      background: #ffffff;
+      color: #000000;
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; }
+      .main-content { padding: 20px; }
+    }
+  </style>
 </head>
-<body>
+<body id="bodyRoot">
 
-    <!-- SIDEBAR NAVIGATION -->
-    <div class="sidebar">
-        <ul class="sidebar-menu">
-            <li><a class="nav-link active" onclick="switchSlide('dashboard-slide', this)"><i class="fa-solid fa-shapes"></i> Dashboard</a></li>
-            <li><a class="nav-link" onclick="switchSlide('master-slide', this)"><i class="fa-solid fa-database"></i> Master Database</a></li>
-            <li><a class="nav-link" onclick="switchSlide('scanner-slide', this)"><i class="fa-solid fa-qrcode"></i> Scanner Kamera</a></li>
-            <li><a class="nav-link" onclick="switchSlide('data-slide', this)"><i class="fa-solid fa-list-check"></i> Data Pemindaian</a></li>
-            <li><a class="nav-link" onclick="switchSlide('export-slide', this)"><i class="fa-solid fa-file-export"></i> Export & Share</a></li>
-        </ul>
+  <!-- Sidebar Navigasi -->
+  <aside class="sidebar">
+    <div class="brand-container">
+      <div class="brand-title">PT DAYA SAKTI NIAGA</div>
+      <div class="brand-sub">Sistem Barcode Otomatis</div>
+    </div>
+    
+    <nav class="nav-menu">
+      <a class="nav-item active" onclick="scrollToSection('sec-dashboard')">
+        <i class="fa-solid fa-shapes" style="color: #00d2ff;"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('sec-scanner')">
+        <i class="fa-solid fa-qrcode" style="color: #00e676;"></i>
+        <span>Scanner</span>
+      </a>
+      <a class="nav-item" onclick="scrollToSection('sec-export')">
+        <i class="fa-solid fa-file-export" style="color: #a855f7;"></i>
+        <span>Export / Share</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Konten Utama -->
+  <main class="main-content" id="sec-dashboard">
+    
+    <div class="header-section">
+      <span class="header-company">PT DAYA SAKTI NIAGA</span>
+      <h1 class="header-title">Selamat Datang!</h1>
+      <p class="header-desc">Manajemen pengelolaan scanner dan data barcode dengan antarmuka super responsif dan presisi tinggi.</p>
     </div>
 
-    <!-- MAIN CONTENT CONTAINING ALL SLIDES -->
-    <div class="main-content">
-
-        <!-- SLIDE 1: DASHBOARD -->
-        <div id="dashboard-slide" class="tab-slide active">
-            <div class="dashboard-header">
-                <h1>Selamat Datang!</h1>
-                <p>Manajemen pengelolaan scanner, validasi data master Excel, dan sistem arsip terintegrasi.</p>
-            </div>
-
-            <div class="card-grid">
-                <!-- Card 1 -->
-                <div class="card blue">
-                    <div>
-                        <div class="card-icon"><i class="fa-solid fa-border-all fa-lg"></i></div>
-                        <h3>DASHBOARD SCANNER</h3>
-                        <p>Buka kamera dan lakukan pemindaian barcode dengan validasi instan.</p>
-                    </div>
-                    <button class="card-action" onclick="switchSlideByMenuIndex(2)">Buka Menu &rarr;</button>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="card green">
-                    <div>
-                        <div class="card-icon"><i class="fa-regular fa-calendar-check fa-lg"></i></div>
-                        <h3>TANGGAL & ARSIP</h3>
-                        <p>Filter riwayat atau akses database arsip terdahulu (`nexus_archive_db`).</p>
-                    </div>
-                    <button class="card-action" onclick="switchSlideByMenuIndex(3)">Cari Data &rarr;</button>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="card purple">
-                    <div>
-                        <div class="card-icon"><i class="fa-solid fa-file-excel fa-lg"></i></div>
-                        <h3>EXPORT / SHARE</h3>
-                        <p>Cetak laporan PDF, ekspor Excel, atau kirim data ringkas ke WhatsApp.</p>
-                    </div>
-                    <button class="card-action" onclick="switchSlideByMenuIndex(4)">Buka Menu &rarr;</button>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="card red">
-                    <div>
-                        <div class="card-icon"><i class="fa-solid fa-trash-can fa-lg"></i></div>
-                        <h3>RESET DATA</h3>
-                        <p>Bersihkan memori aktif pemindaian dan reset histori harian.</p>
-                    </div>
-                    <button class="card-action" onclick="resetDataScanner()">Bersihkan &rarr;</button>
-                </div>
-            </div>
+    <!-- 4 Kotak Menu Terpisah dengan Warna Menyala (Neon Glow) & Ikon Berwarna -->
+    <div class="dashboard-grid">
+      
+      <!-- Kartu 1: Dashboard Scanner -->
+      <div class="menu-card card-blue" onclick="scrollToSection('sec-scanner')">
+        <div class="icon-box">
+          <i class="fa-solid fa-qrcode"></i>
         </div>
+        <h3 class="card-title">Dashboard Scanner</h3>
+        <p class="card-desc">Buka pemindaian kamera dan pindai kode barcode secara otomatis.</p>
+        <button class="card-action">Buka Menu <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
 
-        <!-- SLIDE 2: MASTER DATABASE -->
-        <div id="master-slide" class="tab-slide">
-            <h2>Master Database</h2>
-            <p style="color: var(--text-muted); margin-top: 5px;">Kelola dan validasi data master Excel Anda di sini.</p>
-            <div class="content-box">
-                <!-- Tempatkan Form / Input / Tabel Master Database Anda -->
-                <p>Area Manajemen Master Database.</p>
-            </div>
+      <!-- Kartu 2: Tanggal Scan -->
+      <div class="menu-card card-green" onclick="filterByDatePrompt()">
+        <div class="icon-box">
+          <i class="fa-solid fa-calendar-day"></i>
         </div>
+        <h3 class="card-title">Tanggal Scan</h3>
+        <p class="card-desc">Filter dan pantau riwayat data hasil pemindaian berdasarkan tanggal.</p>
+        <button class="card-action">Buka Menu <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
 
-        <!-- SLIDE 3: SCANNER KAMERA -->
-        <div id="scanner-slide" class="tab-slide">
-            <h2>Scanner Kamera</h2>
-            <p style="color: var(--text-muted); margin-top: 5px;">Arahkan kamera ke barcode/QR Code untuk pemindaian instan.</p>
-            <div class="content-box">
-                <!-- Tempatkan Elemen Pemindai / Preview Kamera Anda -->
-                <p>Area Pemindaian Kamera Aktif.</p>
-            </div>
+      <!-- Kartu 3: Export / Share Data -->
+      <div class="menu-card card-purple" onclick="scrollToSection('sec-export')">
+        <div class="icon-box">
+          <i class="fa-solid fa-file-excel"></i>
         </div>
+        <h3 class="card-title">Export / Share Data</h3>
+        <p class="card-desc">Ekspor data riwayat ke format Excel, PDF, atau bagikan via WhatsApp.</p>
+        <button class="card-action">Buka Menu <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
 
-        <!-- SLIDE 4: DATA PEMINDAIAN -->
-        <div id="data-slide" class="tab-slide">
-            <h2>Data Pemindaian</h2>
-            <p style="color: var(--text-muted); margin-top: 5px;">Riwayat pemindaian dan filter arsip tanggal.</p>
-            <div class="content-box">
-                <!-- Tempatkan Tabel Hasil Pemindaian / Log Anda -->
-                <p>Tabel Data Pemindaian.</p>
-            </div>
+      <!-- Kartu 4: Reset Data -->
+      <div class="menu-card card-red" onclick="resetAllData()">
+        <div class="icon-box">
+          <i class="fa-solid fa-trash-can"></i>
         </div>
-
-        <!-- SLIDE 5: EXPORT & SHARE -->
-        <div id="export-slide" class="tab-slide">
-            <h2>Export & Share</h2>
-            <p style="color: var(--text-muted); margin-top: 5px;">Ekspor laporan ke PDF, Excel, atau WhatsApp.</p>
-            <div class="content-box">
-                <!-- Tempatkan Fitur Cetak / Ekspor Anda -->
-                <p>Menu Cetak Laporan & Ekspor Data.</p>
-            </div>
-        </div>
+        <h3 class="card-title">Reset Data</h3>
+        <p class="card-desc">Bersihkan memori lokal dan hapus seluruh riwayat pemindaian barcode.</p>
+        <button class="card-action">Buka Menu <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
 
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // Fungsi Navigasi Pindah Slide (Tidak Scroll Down)
-        function switchSlide(slideId, element) {
-            // 1. Sembunyikan semua slide
-            const slides = document.querySelectorAll('.tab-slide');
-            slides.forEach(slide => slide.classList.remove('active'));
+    <!-- Area Scanner Kamera -->
+    <div class="section-box" id="sec-scanner">
+      <div class="section-header">
+        <i class="fa-solid fa-camera" style="color: #00e676;"></i>
+        <span>Area Pemindaian Barcode</span>
+      </div>
+      <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto; background: #000; border-radius: 12px; overflow: hidden;"></div>
+    </div>
 
-            // 2. Tampilkan slide yang dipilih
-            const targetSlide = document.getElementById(slideId);
-            if (targetSlide) {
-                targetSlide.classList.add('active');
-            }
+    <!-- Live History Data Table -->
+    <div class="section-box">
+      <div class="section-header">
+        <i class="fa-solid fa-list-check" style="color: #00d2ff;"></i>
+        <span>Riwayat Pemindaian Real-Time</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">No</th>
+              <th>Hasil Barcode</th>
+              <th>Waktu</th>
+              <th>Tanggal</th>
+              <th style="width: 80px; text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="scanTableBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-sub);">Belum ada data pemindaian tersimpan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-            // 3. Update status menu aktif di sidebar
-            if (element) {
-                const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => link.classList.remove('active'));
-                element.classList.add('active');
-            }
-        }
+    <!-- Area Export & Share -->
+    <div class="section-box" id="sec-export">
+      <div class="section-header">
+        <i class="fa-solid fa-share-nodes" style="color: #a855f7;"></i>
+        <span>Export & Bagikan Data</span>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button onclick="exportToExcel()" class="btn btn-green">
+          <i class="fa-solid fa-file-excel"></i> Export Excel
+        </button>
+        <button onclick="exportToPDF()" class="btn btn-red">
+          <i class="fa-solid fa-file-pdf"></i> Export PDF
+        </button>
+        <button onclick="shareViaWhatsApp()" class="btn btn-wa">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </button>
+        <button onclick="shareDataFiles()" class="btn btn-blue">
+          <i class="fa-solid fa-share"></i> Web Share
+        </button>
+      </div>
+    </div>
 
-        // Helper untuk tombol aksi di dalam Kartu Dashboard
-        function switchSlideByMenuIndex(index) {
-            const navLinks = document.querySelectorAll('.nav-link');
-            if (navLinks[index]) {
-                navLinks[index].click();
-            }
-        }
+  </main>
 
-        // Fungsi Reset Data
-        function resetDataScanner() {
-            if (confirm("Apakah Anda yakin ingin membersihkan memori aktif pemindaian?")) {
-                alert("Data berhasil dibersihkan.");
-            }
-        }
-    </script>
+  <!-- Toast Element -->
+  <div id="toast"></div>
+
+  <!-- PDF Template (Hidden) -->
+  <div id="pdfReportTemplate">
+    <h2 style="text-align: center;">LAPORAN SCANNER - PT DAYA SAKTI NIAGA</h2>
+    <hr style="margin: 10px 0;">
+    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #f2f2f2;">
+          <th>No</th>
+          <th>Hasil Scan</th>
+          <th>Waktu</th>
+        </tr>
+      </thead>
+      <tbody id="pdfTbody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Storage Initializers
+    let activeViewData = JSON.parse(localStorage.getItem("nexus_today_data")) || [];
+
+    // Audio Beep Generator (Web Audio API)
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.value = 1000;
+        gain.gain.setValueAtTime(1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+      } catch (e) {}
+    }
+
+    function triggerFlash() {
+      const root = document.getElementById("bodyRoot");
+      root.classList.add("flash-active");
+      setTimeout(() => root.classList.remove("flash-active"), 300);
+    }
+
+    function getFormattedDate() {
+      const d = new Date();
+      return d.toLocaleDateString("id-ID", { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("scanTableBody");
+      if (!tbody) return;
+
+      if (activeViewData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-sub);">Belum ada data pemindaian tersimpan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = activeViewData.map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td style="font-weight: 600; color: #fff;">${item.rawText}</td>
+          <td>${item.time}</td>
+          <td>${item.date || getFormattedDate()}</td>
+          <td style="text-align: center;">
+            <button onclick="deleteSingleItem(${index})" style="background: transparent; border: none; color: #ef4444; cursor: pointer;">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function onScanSuccess(decodedText) {
+      playBeep();
+      triggerFlash();
+
+      const timeStr = new Date().toLocaleTimeString("id-ID");
+      const newItem = {
+        rawText: decodedText,
+        firstVal: decodedText.split('\n')[0],
+        time: timeStr,
+        date: getFormattedDate()
+      };
+      
+      activeViewData.unshift(newItem);
+      localStorage.setItem("nexus_today_data", JSON.stringify(activeViewData));
+      renderTable();
+      showToast("✅ Berhasil Pindai: " + newItem.firstVal);
+    }
+
+    // Initialize Camera Scanner
+    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+    html5QrcodeScanner.render(onScanSuccess);
+
+    // Delete Single Record
+    function deleteSingleItem(index) {
+      activeViewData.splice(index, 1);
+      localStorage.setItem("nexus_today_data", JSON.stringify(activeViewData));
+      renderTable();
+      showToast("🗑️ Item dihapus");
+    }
+
+    // Filter by Date Prompt
+    function filterByDatePrompt() {
+      const filterDate = prompt("Masukkan tanggal pencarian (Contoh: " + getFormattedDate() + "):");
+      if (filterDate) {
+        const filtered = activeViewData.filter(d => d.date && d.date.toLowerCase().includes(filterDate.toLowerCase()));
+        alert("Ditemukan " + filtered.length + " data pada tanggal " + filterDate);
+      }
+    }
+
+    // Reset All Data
+    function resetAllData() {
+      if (confirm("Apakah Anda yakin ingin menghapus seluruh data scan yang tersimpan?")) {
+        activeViewData = [];
+        localStorage.removeItem("nexus_today_data");
+        renderTable();
+        showToast("🧹 Data berhasil dibersihkan!");
+      }
+    }
+
+    // Export to Excel
+    function exportToExcel() {
+      if (activeViewData.length === 0) return alert("Data masih kosong!");
+      const wsData = [["No", "Hasil Scan", "Waktu", "Tanggal"]];
+      activeViewData.forEach((item, index) => {
+        wsData.push([index + 1, item.rawText, item.time, item.date || getFormattedDate()]);
+      });
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Hasil Scan");
+      XLSX.writeFile(wb, `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.xlsx`);
+      showToast("📊 Berhasil Unduh Excel!");
+    }
+
+    // Export to PDF
+    function exportToPDF() {
+      if (activeViewData.length === 0) return alert("Data masih kosong!");
+      const pdfTbody = document.getElementById("pdfTbody");
+      pdfTbody.innerHTML = "";
+      
+      activeViewData.forEach((item, index) => {
+        pdfTbody.innerHTML += `
+          <tr>
+            <td style="text-align:center;">${index + 1}</td>
+            <td>${item.rawText.replace(/\n/g, '<br>')}</td>
+            <td style="text-align:center;">${item.time}</td>
+          </tr>
+        `;
+      });
+
+      const element = document.getElementById("pdfReportTemplate");
+      element.style.display = "block";
+
+      const opt = {
+        margin:       0.5,
+        filename:     `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.style.display = "none";
+        showToast("📄 Berhasil Unduh PDF!");
+      });
+    }
+
+    // Share via WhatsApp
+    function shareViaWhatsApp() {
+      if (activeViewData.length === 0) return alert("Data masih kosong!");
+      let text = `*LAPORAN SCANNER - PT DAYA SAKTI NIAGA*\nTanggal: ${getFormattedDate()}\nTotal Scan: ${activeViewData.length}\n\n`;
+      activeViewData.forEach((item, index) => {
+        text += `${index + 1}. ${item.firstVal} (${item.time})\n`;
+      });
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    // Web Share API
+    async function shareDataFiles() {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Laporan Scanner PT DAYA SAKTI NIAGA',
+            text: `Laporan Hasil Pemindaian Barcode (${getFormattedDate()})`,
+            url: window.location.href
+          });
+          showToast("🔗 Berhasil Dibagikan!");
+        } catch (err) {}
+      } else {
+        alert("Fitur Web Share API tidak didukung pada browser ini.");
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.innerText = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initial Render
+    renderTable();
+  </script>
 </body>
 </html>
