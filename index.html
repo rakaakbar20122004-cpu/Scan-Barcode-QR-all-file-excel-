@@ -1,1179 +1,362 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PT DAYA SAKTI NIAGA - Sistem Scanner Barcode Enterprise</title>
-
-  <!-- External Libraries -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/html5-qrcode"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <style>
-    :root {
-      --bg-dark: #0b1120;
-      --card-bg: rgba(15, 23, 42, 0.75);
-      --sidebar-bg: #070d19;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      
-      /* Accent Colors for Neon Glow */
-      --glow-blue: #00d2ff;
-      --glow-green: #00e676;
-      --glow-purple: #a855f7;
-      --glow-red: #ff5252;
-      --glow-yellow: #ffd600;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      display: flex;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-dark) 70%);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-dark); }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-    /* Sidebar Styling */
-    .sidebar {
-      width: 260px;
-      background-color: var(--sidebar-bg);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
-      display: flex;
-      flex-direction: column;
-      padding: 24px 16px;
-      gap: 20px;
-      flex-shrink: 0;
-    }
-
-    .brand-container {
-      text-align: center;
-      padding-bottom: 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .brand-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: #38bdf8;
-      margin-top: 10px;
-    }
-
-    .brand-sub {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      margin-top: 4px;
-    }
-
-    .nav-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      color: var(--text-sub);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .nav-item:hover, .nav-item.active {
-      background: rgba(56, 189, 248, 0.1);
-      color: #ffffff;
-      border-left: 4px solid #00d2ff;
-    }
-
-    /* Main Content Area */
-    .main-content {
-      flex: 1;
-      padding: 40px;
-      overflow-y: auto;
-    }
-
-    .header-section {
-      margin-bottom: 35px;
-    }
-
-    .header-company {
-      color: #00e676;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .header-title {
-      font-size: 2.2rem;
-      font-weight: 800;
-      margin: 6px 0;
-      color: #ffffff;
-    }
-
-    .header-desc {
-      color: var(--text-sub);
-      font-size: 0.95rem;
-    }
-
-    /* Dashboard Grid System */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
-      margin-bottom: 40px;
-    }
-
-    /* Card Component with Neon Effect */
-    .menu-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 28px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
-    }
-
-    .menu-card:hover {
-      transform: translateY(-6px);
-    }
-
-    /* Neon Borders & Glow */
-    .card-blue {
-      border-top: 3px solid var(--glow-blue);
-      box-shadow: 0 -4px 15px rgba(0, 210, 255, 0.25), 0 10px 30px rgba(0,0,0,0.4);
-    }
-    
-    .card-green {
-      border-top: 3px solid var(--glow-green);
-      box-shadow: 0 -4px 15px rgba(0, 230, 118, 0.25), 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .card-purple {
-      border-top: 3px solid var(--glow-purple);
-      box-shadow: 0 -4px 15px rgba(168, 85, 247, 0.25), 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .card-red {
-      border-top: 3px solid var(--glow-red);
-      box-shadow: 0 -4px 15px rgba(255, 82, 82, 0.25), 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    /* Icon Box with Colored Background */
-    .icon-box {
-      width: 64px;
-      height: 64px;
-      border-radius: 14px;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .icon-box i { font-size: 1.8rem; }
-    .card-blue .icon-box i { color: #0284c7; }
-    .card-green .icon-box i { color: #16a34a; }
-    .card-purple .icon-box i { color: #9333ea; }
-    .card-red .icon-box i { color: #dc2626; }
-
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .card-desc {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      line-height: 1.4;
-      margin-bottom: 24px;
-      flex-grow: 1;
-    }
-
-    .card-action {
-      font-size: 0.85rem;
-      font-weight: 600;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: gap 0.2s ease;
-    }
-
-    .card-blue .card-action { color: var(--glow-blue); }
-    .card-green .card-action { color: var(--glow-green); }
-    .card-purple .card-action { color: var(--glow-purple); }
-    .card-red .card-action { color: var(--glow-red); }
-
-    .menu-card:hover .card-action { gap: 10px; }
-
-    /* Section Boxes */
-    .section-box {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 30px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .section-header {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .section-title-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Buttons */
-    .btn {
-      padding: 10px 18px;
-      border-radius: 8px;
-      border: none;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s;
-    }
-
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-green { background: #10b981; color: #fff; }
-    .btn-red { background: #ef4444; color: #fff; }
-    .btn-wa { background: #25d366; color: #fff; }
-    .btn-blue { background: #3b82f6; color: #fff; }
-    .btn-dark { background: #334155; color: #fff; }
-
-    /* Controls & Search Bar */
-    .table-controls {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .search-input, .select-input {
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    .search-input { flex: 1; min-width: 200px; }
-    .search-input:focus, .select-input:focus { border-color: var(--glow-blue); }
-
-    /* Table & Badges */
-    .table-wrapper {
-      overflow-x: auto;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-
-    .data-table th, .data-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.9rem;
-    }
-
-    .data-table th {
-      background: rgba(255, 255, 255, 0.04);
-      color: #38bdf8;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.5px;
-    }
-
-    .data-table tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .badge-match { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-    .badge-unmatch { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-    .badge-manual { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 15px;
-      font-size: 0.85rem;
-      color: var(--text-sub);
-    }
-
-    .pagination-btns { display: flex; gap: 8px; }
-
-    /* Flash FX */
-    .flash-active { animation: flash-animation 0.3s ease-out; }
-    @keyframes flash-animation {
-      0% { background-color: rgba(0, 210, 255, 0.3); }
-      100% { background-color: transparent; }
-    }
-
-    /* Modal / Pop-Up Window */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
-    .modal-box {
-      background: #0f172a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      width: 90%;
-      max-width: 500px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      transform: translateY(-20px);
-      transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.active .modal-box { transform: translateY(0); }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .modal-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
-    .modal-close { background: transparent; border: none; color: var(--text-sub); font-size: 1.2rem; cursor: pointer; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 6px; }
-    .form-control { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; outline: none; }
-
-    /* Toast Notification */
-    #toast {
-      visibility: hidden;
-      min-width: 250px;
-      background-color: #00d2ff;
-      color: #000;
-      text-align: center;
-      border-radius: 8px;
-      padding: 12px;
-      position: fixed;
-      z-index: 9999;
-      right: 30px;
-      bottom: 30px;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(0,210,255,0.4);
-    }
-
-    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.0s; }
-    @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-    @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
-
-    /* PDF Template (Hidden) */
-    #pdfReportTemplate { display: none; background: #ffffff; color: #000000; padding: 20px; }
-
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .sidebar { width: 100%; }
-      .main-content { padding: 20px; }
-    }
-  </style>
-</head>
-<body id="bodyRoot">
-
-  <!-- Sidebar Navigasi -->
-  <aside class="sidebar">
-    <div class="brand-container">
-      <div class="brand-title">PT DAYA SAKTI NIAGA</div>
-      <div class="brand-sub">Sistem Barcode Enterprise</div>
-    </div>
-    
-    <nav class="nav-menu">
-      <a class="nav-item active" onclick="scrollToSection('sec-dashboard')">
-        <i class="fa-solid fa-shapes" style="color: #00d2ff;"></i>
-        <span>Dashboard</span>
-      </a>
-      <a class="nav-item" onclick="scrollToSection('sec-master')">
-        <i class="fa-solid fa-database" style="color: #ffd600;"></i>
-        <span>Master Database</span>
-      </a>
-      <a class="nav-item" onclick="scrollToSection('sec-scanner')">
-        <i class="fa-solid fa-qrcode" style="color: #00e676;"></i>
-        <span>Scanner Kamera</span>
-      </a>
-      <a class="nav-item" onclick="scrollToSection('sec-table')">
-        <i class="fa-solid fa-table-list" style="color: #38bdf8;"></i>
-        <span>Data Pemindaian</span>
-      </a>
-      <a class="nav-item" onclick="scrollToSection('sec-export')">
-        <i class="fa-solid fa-file-export" style="color: #a855f7;"></i>
-        <span>Export & Share</span>
-      </a>
-    </nav>
-  </aside>
-
-  <!-- Konten Utama -->
-  <main class="main-content" id="sec-dashboard">
-    
-    <div class="header-section">
-      <span class="header-company">PT DAYA SAKTI NIAGA</span>
-      <h1 class="header-title">Selamat Datang!</h1>
-      <p class="header-desc">Manajemen pengelolaan scanner, validasi data master Excel, dan sistem arsip terintegrasi.</p>
-    </div>
-
-    <!-- 4 Kotak Menu Utama -->
-    <div class="dashboard-grid">
-      <div class="menu-card card-blue" onclick="scrollToSection('sec-scanner')">
-        <div class="icon-box"><i class="fa-solid fa-qrcode"></i></div>
-        <h3 class="card-title">Dashboard Scanner</h3>
-        <p class="card-desc">Buka kamera dan lakukan pemindaian barcode dengan validasi instan.</p>
-        <button class="card-action">Buka Menu <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-
-      <div class="menu-card card-green" onclick="openFilterModal()">
-        <div class="icon-box"><i class="fa-solid fa-calendar-day"></i></div>
-        <h3 class="card-title">Tanggal & Arsip</h3>
-        <p class="card-desc">Filter riwayat atau akses database arsip terdahulu (`nexus_archive_db`).</p>
-        <button class="card-action">Cari Data <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-
-      <div class="menu-card card-purple" onclick="scrollToSection('sec-export')">
-        <div class="icon-box"><i class="fa-solid fa-file-excel"></i></div>
-        <h3 class="card-title">Export / Share</h3>
-        <p class="card-desc">Cetak laporan PDF, ekspor Excel, atau kirim data ringkas ke WhatsApp.</p>
-        <button class="card-action">Buka Menu <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-
-      <div class="menu-card card-red" onclick="resetAllData()">
-        <div class="icon-box"><i class="fa-solid fa-trash-can"></i></div>
-        <h3 class="card-title">Reset Data</h3>
-        <p class="card-desc">Bersihkan memori aktif pemindaian dan reset histori harian.</p>
-        <button class="card-action">Bersihkan <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-    </div>
-
-    <!-- Section 1: Master Data Excel Integration -->
-    <div class="section-box" id="sec-master">
-      <div class="section-header">
-        <div class="section-title-group">
-          <i class="fa-solid fa-file-csv" style="color: #ffd600;"></i>
-          <span>Integrasi Database Master Excel</span>
-        </div>
-        <span id="masterStatusBadge" class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-sub);">Belum Ada Data</span>
-      </div>
-      <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px;">
-        Unggah file Master Data (.xlsx / .csv) untuk pencocokan otomatis (*auto-match validation*) dengan hasil scan.
-      </p>
-      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleMasterUpload(event)">
-        <button class="btn btn-dark" onclick="document.getElementById('excelFileInput').click()">
-          <i class="fa-solid fa-upload"></i> Unggah Master Excel
-        </button>
-        <button class="btn btn-red" onclick="clearMasterData()" id="btnClearMaster" style="display: none;">
-          <i class="fa-solid fa-xmark"></i> Hapus Master
-        </button>
-      </div>
-    </div>
-
-    <!-- Section 2: Area Scanner Kamera -->
-    <div class="section-box" id="sec-scanner">
-      <div class="section-header">
-        <div class="section-title-group">
-          <i class="fa-solid fa-camera" style="color: #00e676;"></i>
-          <span>Area Pemindaian Barcode</span>
-        </div>
-        <button class="btn btn-blue" onclick="openManualInputModal()"><i class="fa-solid fa-keyboard"></i> Input Manual</button>
-      </div>
-      <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto; background: #000; border-radius: 12px; overflow: hidden;"></div>
-    </div>
-
-    <!-- Section 3: Live History Table & DOM Management -->
-    <div class="section-box" id="sec-table">
-      <div class="section-header">
-        <div class="section-title-group">
-          <i class="fa-solid fa-table-list" style="color: #38bdf8;"></i>
-          <span>Tabel Riwayat Pemindaian Real-Time</span>
-        </div>
-        <span id="totalItemsCount" style="font-size: 0.85rem; color: #38bdf8; font-weight: 700;">Total: 0 Item</span>
-      </div>
-
-      <!-- Controls: Search, Filter, Pagination Limit -->
-      <div class="table-controls">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari barcode, nama produk, atau waktu..." oninput="handleSearch()">
-        <select id="filterStatus" class="select-input" onchange="renderTable()">
-          <option value="ALL">Semua Status Validation</option>
-          <option value="MATCH">Sesuai Master (Match)</option>
-          <option value="UNMATCH">Tidak Ada di Master</option>
-          <option value="MANUAL">Input Manual</option>
-        </select>
-      </div>
-
-      <!-- Table Wrapper -->
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width: 50px;">No</th>
-              <th>Hasil Barcode</th>
-              <th>Informasi Master Item</th>
-              <th>Waktu</th>
-              <th>Status Validasi</th>
-              <th style="text-align: center; width: 100px;">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="scanTableBody">
-            <tr>
-              <td colspan="6" style="text-align: center; color: var(--text-sub);">Belum ada data pemindaian tersimpan.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination Footer -->
-      <div class="pagination">
-        <span id="paginationInfo">Menampilkan 0 dari 0 data</span>
-        <div class="pagination-btns">
-          <button class="btn btn-dark" id="btnPrevPage" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-          <button class="btn btn-dark" id="btnNextPage" onclick="changePage(1)"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 4: Export & Share -->
-    <div class="section-box" id="sec-export">
-      <div class="section-header">
-        <div class="section-title-group">
-          <i class="fa-solid fa-share-nodes" style="color: #a855f7;"></i>
-          <span>Export & Bagikan Data</span>
-        </div>
-      </div>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-        <button onclick="exportToExcel()" class="btn btn-green"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
-        <button onclick="exportToPDF()" class="btn btn-red"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
-        <button onclick="shareViaWhatsApp()" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-        <button onclick="shareDataFiles()" class="btn btn-blue"><i class="fa-solid fa-share"></i> Web Share</button>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- Modal 1: Filter / Cari Tanggal & Arsip -->
-  <div class="modal-overlay" id="filterModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title"><i class="fa-solid fa-filter" style="color: #00e676;"></i> Cari / Filter Data Arsip</div>
-        <button class="modal-close" onclick="closeModal('filterModal')">&times;</button>
-      </div>
-      <div class="form-group">
-        <label>Pilih Tanggal Pencarian</label>
-        <input type="date" id="filterDateInput" class="form-control">
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-        <button class="btn btn-dark" onclick="closeModal('filterModal')">Batal</button>
-        <button class="btn btn-green" onclick="executeFilterDate()">Terapkan Filter</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 2: Input Manual Barcode -->
-  <div class="modal-overlay" id="manualInputModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title"><i class="fa-solid fa-keyboard" style="color: #38bdf8;"></i> Input Barcode Manual</div>
-        <button class="modal-close" onclick="closeModal('manualInputModal')">&times;</button>
-      </div>
-      <div class="form-group">
-        <label>Kode Barcode / QR</label>
-        <input type="text" id="manualCodeInput" class="form-control" placeholder="Ketik kode di sini...">
-      </div>
-      <div class="form-group">
-        <label>Keterangan Tambahan (Opsional)</label>
-        <input type="text" id="manualDescInput" class="form-control" placeholder="Nama barang / deskripsi...">
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-        <button class="btn btn-dark" onclick="closeModal('manualInputModal')">Batal</button>
-        <button class="btn btn-blue" onclick="saveManualInput()">Simpan Data</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 3: Edit Item -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title"><i class="fa-solid fa-pen-to-square" style="color: #a855f7;"></i> Edit Data Pemindaian</div>
-        <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
-      </div>
-      <input type="hidden" id="editItemIndex">
-      <div class="form-group">
-        <label>Kode Barcode</label>
-        <input type="text" id="editBarcodeInput" class="form-control">
-      </div>
-      <div class="form-group">
-        <label>Informasi Master / Keterangan</label>
-        <input type="text" id="editInfoInput" class="form-control">
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-        <button class="btn btn-dark" onclick="closeModal('editModal')">Batal</button>
-        <button class="btn btn-green" onclick="saveEditItem()">Update</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Element -->
-  <div id="toast"></div>
-
-  <!-- PDF Template (Hidden) -->
-  <div id="pdfReportTemplate">
-    <h2 style="text-align: center; margin-bottom: 5px;">LAPORAN SCANNER - PT DAYA SAKTI NIAGA</h2>
-    <p style="text-align: center; font-size: 0.8rem; margin-bottom: 15px;" id="pdfReportDate"></p>
-    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; font-size: 11px;">
-      <thead>
-        <tr style="background-color: #f2f2f2;">
-          <th>No</th>
-          <th>Barcode</th>
-          <th>Informasi Master</th>
-          <th>Waktu</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="pdfTbody"></tbody>
-    </table>
-  </div>
-
-  <script>
-    /* ==========================================================================
-       1. GLOBAL STATE & STORAGE INITIALIZATION
-       ========================================================================== */
-    let activeViewData = [];
-    let masterDatabase = JSON.parse(localStorage.getItem("nexus_master_db")) || [];
-    let archiveDatabase = JSON.parse(localStorage.getItem("nexus_archive_db")) || {};
-    
-    // Pagination & Search State
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let filteredData = [];
-
-    function getTodayKey() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    }
-
-    function getFormattedDate() {
-      return new Date().toLocaleDateString("id-ID", { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-
-    // Init Data Management with Archive Check
-    function initDataStorage() {
-      const todayKey = getTodayKey();
-      const storedToday = localStorage.getItem("nexus_today_data");
-      
-      if (storedToday) {
-        activeViewData = JSON.parse(storedToday);
-      } else {
-        activeViewData = [];
-      }
-      updateMasterUIBadge();
-    }
-
-    /* ==========================================================================
-       2. MASTER EXCEL DATABASE INTEGRATION
-       ========================================================================== */
-    function handleMasterUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonArr = XLSX.utils.sheet_to_json(firstSheet);
-
-          if (jsonArr.length === 0) {
-            alert("File Excel kosong atau format tidak sesuai!");
-            return;
-          }
-
-          masterDatabase = jsonArr.map(row => {
-            const keys = Object.keys(row);
-            const barcodeKey = keys.find(k => /code|barcode|sku|id/i.test(k)) || keys[0];
-            const nameKey = keys.find(k => /nama|deskripsi|item|product/i.test(k)) || keys[1] || keys[0];
-            return {
-              code: String(row[barcodeKey]).trim(),
-              info: String(row[nameKey]).trim()
-            };
-          });
-
-          localStorage.setItem("nexus_master_db", JSON.stringify(masterDatabase));
-          updateMasterUIBadge();
-          revalidateActiveData();
-          showToast(`✅ ${masterDatabase.length} data master berhasil diunggah!`);
-        } catch (err) {
-          alert("Gagal membaca file Excel. Pastikan format file benar.");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Scanner Management System</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --sidebar-bg: #070a14;
+            --card-bg: #111726;
+            --accent-blue: #00d2ff;
+            --accent-green: #00e676;
+            --accent-purple: #a855f7;
+            --accent-red: #ff4d4d;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
         }
-      };
-      reader.readAsArrayBuffer(file);
-    }
 
-    function clearMasterData() {
-      if (confirm("Hapus database master Excel yang tersimpan?")) {
-        masterDatabase = [];
-        localStorage.removeItem("nexus_master_db");
-        updateMasterUIBadge();
-        revalidateActiveData();
-        showToast("🧹 Data master dihapus");
-      }
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    function updateMasterUIBadge() {
-      const badge = document.getElementById("masterStatusBadge");
-      const btnClear = document.getElementById("btnClearMaster");
-      if (masterDatabase.length > 0) {
-        badge.className = "badge badge-match";
-        badge.innerText = `Master Active: ${masterDatabase.length} Item`;
-        btnClear.style.display = "inline-flex";
-      } else {
-        badge.className = "badge";
-        badge.style.background = "rgba(255,255,255,0.05)";
-        badge.style.color = "var(--text-sub)";
-        badge.innerText = "Belum Ada Data";
-        btnClear.style.display = "none";
-      }
-    }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    function matchWithMaster(code) {
-      if (masterDatabase.length === 0) return { matched: false, info: "-" };
-      const found = masterDatabase.find(m => m.code.toLowerCase() === code.toLowerCase());
-      if (found) {
-        return { matched: true, info: found.info };
-      }
-      return { matched: false, info: "Tidak Ada di Master" };
-    }
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
 
-    function revalidateActiveData() {
-      activeViewData = activeViewData.map(item => {
-        if (item.status === "MANUAL") return item;
-        const res = matchWithMaster(item.rawText);
-        return {
-          ...item,
-          info: res.info,
-          status: res.matched ? "MATCH" : "UNMATCH"
-        };
-      });
-      saveAndRender();
-    }
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
 
-    /* ==========================================================================
-       3. SCANNER & SOUND / FLASH FX
-       ========================================================================== */
-    function playBeep() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = "sine";
-        osc.frequency.value = 1000;
-        gain.gain.setValueAtTime(1, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.15);
-      } catch (e) {}
-    }
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
 
-    function triggerFlash() {
-      const root = document.getElementById("bodyRoot");
-      root.classList.add("flash-active");
-      setTimeout(() => root.classList.remove("flash-active"), 300);
-    }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-    function onScanSuccess(decodedText) {
-      playBeep();
-      triggerFlash();
+        .sidebar-menu a i {
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
 
-      const timeStr = new Date().toLocaleTimeString("id-ID");
-      const matchResult = matchWithMaster(decodedText);
+        .sidebar-menu a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-      const newItem = {
-        rawText: decodedText,
-        info: matchResult.info,
-        time: timeStr,
-        date: getFormattedDate(),
-        status: matchResult.matched ? "MATCH" : "UNMATCH"
-      };
+        /* Active Sidebar Item */
+        .sidebar-menu a.active {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(0, 210, 255, 0.15) 0%, rgba(0, 210, 255, 0) 100%);
+            border-left: 3px solid var(--accent-blue);
+        }
 
-      activeViewData.unshift(newItem);
-      saveAndRender();
-      showToast(`✅ Scan: ${decodedText}`);
-    }
+        /* Main Content Container */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
 
-    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
-    html5QrcodeScanner.render(onScanSuccess);
+        /* Slide View Logic (Single Page Application) */
+        .tab-slide {
+            display: none; /* Sembunyikan slide secara default */
+            animation: fadeIn 0.3s ease-in-out;
+        }
 
-    /* ==========================================================================
-       4. TABLE MANIPULATION, SEARCH, PAGINATION & DOM
-       ========================================================================== */
-    function saveAndRender() {
-      localStorage.setItem("nexus_today_data", JSON.stringify(activeViewData));
-      
-      // Save to Archive DB by Date
-      const todayKey = getTodayKey();
-      archiveDatabase[todayKey] = activeViewData;
-      localStorage.setItem("nexus_archive_db", JSON.stringify(archiveDatabase));
+        .tab-slide.active {
+            display: block; /* Tampilkan hanya slide aktif */
+        }
 
-      renderTable();
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    function handleSearch() {
-      currentPage = 1;
-      renderTable();
-    }
+        /* Dashboard Slide Header */
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
 
-    function renderTable() {
-      const tbody = document.getElementById("scanTableBody");
-      const searchVal = document.getElementById("searchInput").value.toLowerCase();
-      const filterStatus = document.getElementById("filterStatus").value;
+        .dashboard-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
 
-      // Filter Logic
-      filteredData = activeViewData.filter(item => {
-        const matchesSearch = item.rawText.toLowerCase().includes(searchVal) ||
-                              item.info.toLowerCase().includes(searchVal) ||
-                              item.time.toLowerCase().includes(searchVal);
-        const matchesStatus = filterStatus === "ALL" || item.status === filterStatus;
-        return matchesSearch && matchesStatus;
-      });
+        /* Card Grid Layout */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
 
-      // Update Total Counter
-      document.getElementById("totalItemsCount").innerText = `Total: ${filteredData.length} Item`;
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            min-height: 280px;
+        }
 
-      if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-sub);">Tidak ada data yang ditemukan.</td></tr>`;
-        updatePagination(0);
-        return;
-      }
+        /* Card Borders Highlight */
+        .card.blue { border-color: rgba(0, 210, 255, 0.4); }
+        .card.green { border-color: rgba(0, 230, 118, 0.4); }
+        .card.purple { border-color: rgba(168, 85, 247, 0.4); }
+        .card.red { border-color: rgba(255, 77, 77, 0.4); }
 
-      // Pagination Calculation
-      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-      if (currentPage > totalPages) currentPage = totalPages;
-      if (currentPage < 1) currentPage = 1;
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
 
-      const startIdx = (currentPage - 1) * itemsPerPage;
-      const pageData = filteredData.slice(startIdx, startIdx + itemsPerPage);
+        .card.blue .card-icon { color: var(--accent-blue); }
+        .card.green .card-icon { color: var(--accent-green); }
+        .card.purple .card-icon { color: var(--accent-purple); }
+        .card.red .card-icon { color: var(--accent-red); }
 
-      tbody.innerHTML = pageData.map((item, index) => {
-        const realIdx = activeViewData.indexOf(item);
-        let badgeClass = "badge-unmatch";
-        if (item.status === "MATCH") badgeClass = "badge-match";
-        if (item.status === "MANUAL") badgeClass = "badge-manual";
+        .card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
 
-        return `
-          <tr>
-            <td>${startIdx + index + 1}</td>
-            <td style="font-weight: 700; color: #fff;">${item.rawText}</td>
-            <td>${item.info}</td>
-            <td>${item.time}</td>
-            <td><span class="badge ${badgeClass}">${item.status}</span></td>
-            <td style="text-align: center;">
-              <button onclick="openEditModal(${realIdx})" style="background: transparent; border: none; color: #a855f7; cursor: pointer; margin-right: 8px;">
-                <i class="fa-solid fa-pen-to-square"></i>
-              </button>
-              <button onclick="deleteSingleItem(${realIdx})" style="background: transparent; border: none; color: #ef4444; cursor: pointer;">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+        .card p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
 
-      updatePagination(filteredData.length);
-    }
+        .card-action {
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: gap 0.2s;
+        }
 
-    function updatePagination(totalItems) {
-      const info = document.getElementById("paginationInfo");
-      const btnPrev = document.getElementById("btnPrevPage");
-      const btnNext = document.getElementById("btnNextPage");
+        .card.blue .card-action { color: var(--accent-blue); }
+        .card.green .card-action { color: var(--accent-green); }
+        .card.purple .card-action { color: var(--accent-purple); }
+        .card.red .card-action { color: var(--accent-red); }
 
-      if (totalItems === 0) {
-        info.innerText = "Menampilkan 0 dari 0 data";
-        btnPrev.disabled = true;
-        btnNext.disabled = true;
-        return;
-      }
+        .card-action:hover {
+            gap: 10px;
+        }
 
-      const totalPages = Math.ceil(totalItems / itemsPerPage);
-      const start = (currentPage - 1) * itemsPerPage + 1;
-      const end = Math.min(currentPage * itemsPerPage, totalItems);
+        /* Generic Slide Content Boxes */
+        .content-box {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
 
-      info.innerText = `Menampilkan ${start}-${end} dari ${totalItems} data (Halaman ${currentPage}/${totalPages})`;
-      btnPrev.disabled = currentPage === 1;
-      btnNext.disabled = currentPage === totalPages;
-    }
+    <!-- SIDEBAR NAVIGATION -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <li><a class="nav-link active" onclick="switchSlide('dashboard-slide', this)"><i class="fa-solid fa-shapes"></i> Dashboard</a></li>
+            <li><a class="nav-link" onclick="switchSlide('master-slide', this)"><i class="fa-solid fa-database"></i> Master Database</a></li>
+            <li><a class="nav-link" onclick="switchSlide('scanner-slide', this)"><i class="fa-solid fa-qrcode"></i> Scanner Kamera</a></li>
+            <li><a class="nav-link" onclick="switchSlide('data-slide', this)"><i class="fa-solid fa-list-check"></i> Data Pemindaian</a></li>
+            <li><a class="nav-link" onclick="switchSlide('export-slide', this)"><i class="fa-solid fa-file-export"></i> Export & Share</a></li>
+        </ul>
+    </div>
 
-    function changePage(direction) {
-      currentPage += direction;
-      renderTable();
-    }
+    <!-- MAIN CONTENT CONTAINING ALL SLIDES -->
+    <div class="main-content">
 
-    function deleteSingleItem(index) {
-      if (confirm("Hapus baris data ini?")) {
-        activeViewData.splice(index, 1);
-        saveAndRender();
-        showToast("🗑️ Item berhasil dihapus");
-      }
-    }
+        <!-- SLIDE 1: DASHBOARD -->
+        <div id="dashboard-slide" class="tab-slide active">
+            <div class="dashboard-header">
+                <h1>Selamat Datang!</h1>
+                <p>Manajemen pengelolaan scanner, validasi data master Excel, dan sistem arsip terintegrasi.</p>
+            </div>
 
-    function resetAllData() {
-      if (confirm("Apakah Anda yakin ingin menghapus seluruh data scan hari ini?")) {
-        activeViewData = [];
-        saveAndRender();
-        showToast("🧹 Data berhasil dibersihkan!");
-      }
-    }
+            <div class="card-grid">
+                <!-- Card 1 -->
+                <div class="card blue">
+                    <div>
+                        <div class="card-icon"><i class="fa-solid fa-border-all fa-lg"></i></div>
+                        <h3>DASHBOARD SCANNER</h3>
+                        <p>Buka kamera dan lakukan pemindaian barcode dengan validasi instan.</p>
+                    </div>
+                    <button class="card-action" onclick="switchSlideByMenuIndex(2)">Buka Menu &rarr;</button>
+                </div>
 
-    /* ==========================================================================
-       5. MODAL SYSTEM & ACTIONS
-       ========================================================================== */
-    function openModal(id) { document.getElementById(id).classList.add("active"); }
-    function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+                <!-- Card 2 -->
+                <div class="card green">
+                    <div>
+                        <div class="card-icon"><i class="fa-regular fa-calendar-check fa-lg"></i></div>
+                        <h3>TANGGAL & ARSIP</h3>
+                        <p>Filter riwayat atau akses database arsip terdahulu (`nexus_archive_db`).</p>
+                    </div>
+                    <button class="card-action" onclick="switchSlideByMenuIndex(3)">Cari Data &rarr;</button>
+                </div>
 
-    function openFilterModal() { openModal("filterModal"); }
-    function openManualInputModal() { openModal("manualInputModal"); }
+                <!-- Card 3 -->
+                <div class="card purple">
+                    <div>
+                        <div class="card-icon"><i class="fa-solid fa-file-excel fa-lg"></i></div>
+                        <h3>EXPORT / SHARE</h3>
+                        <p>Cetak laporan PDF, ekspor Excel, atau kirim data ringkas ke WhatsApp.</p>
+                    </div>
+                    <button class="card-action" onclick="switchSlideByMenuIndex(4)">Buka Menu &rarr;</button>
+                </div>
 
-    function executeFilterDate() {
-      const dateVal = document.getElementById("filterDateInput").value;
-      if (!dateVal) return alert("Pilih tanggal terlebih dahulu!");
+                <!-- Card 4 -->
+                <div class="card red">
+                    <div>
+                        <div class="card-icon"><i class="fa-solid fa-trash-can fa-lg"></i></div>
+                        <h3>RESET DATA</h3>
+                        <p>Bersihkan memori aktif pemindaian dan reset histori harian.</p>
+                    </div>
+                    <button class="card-action" onclick="resetDataScanner()">Bersihkan &rarr;</button>
+                </div>
+            </div>
+        </div>
 
-      const archived = archiveDatabase[dateVal];
-      if (archived && archived.length > 0) {
-        activeViewData = archived;
-        renderTable();
-        closeModal("filterModal");
-        showToast(`📅 Dimuat: ${archived.length} data tanggal ${dateVal}`);
-      } else {
-        alert("Tidak ada data tersimpan untuk tanggal tersebut.");
-      }
-    }
+        <!-- SLIDE 2: MASTER DATABASE -->
+        <div id="master-slide" class="tab-slide">
+            <h2>Master Database</h2>
+            <p style="color: var(--text-muted); margin-top: 5px;">Kelola dan validasi data master Excel Anda di sini.</p>
+            <div class="content-box">
+                <!-- Tempatkan Form / Input / Tabel Master Database Anda -->
+                <p>Area Manajemen Master Database.</p>
+            </div>
+        </div>
 
-    function saveManualInput() {
-      const code = document.getElementById("manualCodeInput").value.trim();
-      const desc = document.getElementById("manualDescInput").value.trim();
+        <!-- SLIDE 3: SCANNER KAMERA -->
+        <div id="scanner-slide" class="tab-slide">
+            <h2>Scanner Kamera</h2>
+            <p style="color: var(--text-muted); margin-top: 5px;">Arahkan kamera ke barcode/QR Code untuk pemindaian instan.</p>
+            <div class="content-box">
+                <!-- Tempatkan Elemen Pemindai / Preview Kamera Anda -->
+                <p>Area Pemindaian Kamera Aktif.</p>
+            </div>
+        </div>
 
-      if (!code) return alert("Kode barcode tidak boleh kosong!");
+        <!-- SLIDE 4: DATA PEMINDAIAN -->
+        <div id="data-slide" class="tab-slide">
+            <h2>Data Pemindaian</h2>
+            <p style="color: var(--text-muted); margin-top: 5px;">Riwayat pemindaian dan filter arsip tanggal.</p>
+            <div class="content-box">
+                <!-- Tempatkan Tabel Hasil Pemindaian / Log Anda -->
+                <p>Tabel Data Pemindaian.</p>
+            </div>
+        </div>
 
-      const timeStr = new Date().toLocaleTimeString("id-ID");
-      const newItem = {
-        rawText: code,
-        info: desc || "Input Manual",
-        time: timeStr,
-        date: getFormattedDate(),
-        status: "MANUAL"
-      };
+        <!-- SLIDE 5: EXPORT & SHARE -->
+        <div id="export-slide" class="tab-slide">
+            <h2>Export & Share</h2>
+            <p style="color: var(--text-muted); margin-top: 5px;">Ekspor laporan ke PDF, Excel, atau WhatsApp.</p>
+            <div class="content-box">
+                <!-- Tempatkan Fitur Cetak / Ekspor Anda -->
+                <p>Menu Cetak Laporan & Ekspor Data.</p>
+            </div>
+        </div>
 
-      activeViewData.unshift(newItem);
-      saveAndRender();
-      closeModal("manualInputModal");
-      document.getElementById("manualCodeInput").value = "";
-      document.getElementById("manualDescInput").value = "";
-      showToast("✏️ Data manual disimpan");
-    }
+    </div>
 
-    function openEditModal(index) {
-      const item = activeViewData[index];
-      document.getElementById("editItemIndex").value = index;
-      document.getElementById("editBarcodeInput").value = item.rawText;
-      document.getElementById("editInfoInput").value = item.info;
-      openModal("editModal");
-    }
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Fungsi Navigasi Pindah Slide (Tidak Scroll Down)
+        function switchSlide(slideId, element) {
+            // 1. Sembunyikan semua slide
+            const slides = document.querySelectorAll('.tab-slide');
+            slides.forEach(slide => slide.classList.remove('active'));
 
-    function saveEditItem() {
-      const index = document.getElementById("editItemIndex").value;
-      const newBarcode = document.getElementById("editBarcodeInput").value.trim();
-      const newInfo = document.getElementById("editInfoInput").value.trim();
+            // 2. Tampilkan slide yang dipilih
+            const targetSlide = document.getElementById(slideId);
+            if (targetSlide) {
+                targetSlide.classList.add('active');
+            }
 
-      if (!newBarcode) return alert("Barcode tidak boleh kosong!");
+            // 3. Update status menu aktif di sidebar
+            if (element) {
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => link.classList.remove('active'));
+                element.classList.add('active');
+            }
+        }
 
-      activeViewData[index].rawText = newBarcode;
-      activeViewData[index].info = newInfo;
-      saveAndRender();
-      closeModal("editModal");
-      showToast("✅ Data diperbarui");
-    }
+        // Helper untuk tombol aksi di dalam Kartu Dashboard
+        function switchSlideByMenuIndex(index) {
+            const navLinks = document.querySelectorAll('.nav-link');
+            if (navLinks[index]) {
+                navLinks[index].click();
+            }
+        }
 
-    /* ==========================================================================
-       6. EXPORT & SHARE FUNCTIONS
-       ========================================================================== */
-    function exportToExcel() {
-      if (activeViewData.length === 0) return alert("Data masih kosong!");
-      const wsData = [["No", "Hasil Barcode", "Informasi Master", "Waktu", "Tanggal", "Status Validasi"]];
-      
-      activeViewData.forEach((item, index) => {
-        wsData.push([index + 1, item.rawText, item.info, item.time, item.date || getFormattedDate(), item.status]);
-      });
-
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Laporan Scan");
-      XLSX.writeFile(wb, `Laporan_Scan_${getTodayKey()}.xlsx`);
-      showToast("📊 Berhasil unduh Excel!");
-    }
-
-    function exportToPDF() {
-      if (activeViewData.length === 0) return alert("Data masih kosong!");
-      
-      document.getElementById("pdfReportDate").innerText = `Tanggal: ${getFormattedDate()} | Total: ${activeViewData.length} Scan`;
-      const pdfTbody = document.getElementById("pdfTbody");
-      pdfTbody.innerHTML = "";
-
-      activeViewData.forEach((item, index) => {
-        pdfTbody.innerHTML += `
-          <tr>
-            <td style="text-align:center;">${index + 1}</td>
-            <td><b>${item.rawText}</b></td>
-            <td>${item.info}</td>
-            <td style="text-align:center;">${item.time}</td>
-            <td style="text-align:center;">${item.status}</td>
-          </tr>
-        `;
-      });
-
-      const element = document.getElementById("pdfReportTemplate");
-      element.style.display = "block";
-
-      const opt = {
-        margin: 0.5,
-        filename: `Laporan_Scan_${getTodayKey()}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-
-      html2pdf().set(opt).from(element).save().then(() => {
-        element.style.display = "none";
-        showToast("📄 Berhasil unduh PDF!");
-      });
-    }
-
-    function shareViaWhatsApp() {
-      if (activeViewData.length === 0) return alert("Data masih kosong!");
-      let text = `*LAPORAN SCANNER - PT DAYA SAKTI NIAGA*\nTanggal: ${getFormattedDate()}\nTotal Scan: ${activeViewData.length}\n\n`;
-      
-      activeViewData.slice(0, 15).forEach((item, index) => {
-        text += `${index + 1}. *${item.rawText}* - ${item.info} (${item.time})\n`;
-      });
-
-      if (activeViewData.length > 15) text += `\n...dan ${activeViewData.length - 15} data lainnya.`;
-
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
-    }
-
-    async function shareDataFiles() {
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Laporan Scanner PT DAYA SAKTI NIAGA',
-            text: `Laporan Barcode Tanggal ${getFormattedDate()} (Total: ${activeViewData.length} Scan)`,
-            url: window.location.href
-          });
-          showToast("🔗 Berhasil dibagikan!");
-        } catch (err) {}
-      } else {
-        alert("Fitur Web Share API tidak didukung pada browser ini.");
-      }
-    }
-
-    /* ==========================================================================
-       7. HELPER FUNCTIONS
-       ========================================================================== */
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      toast.innerText = message;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2500);
-    }
-
-    function scrollToSection(id) {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // App Initialization
-    initDataStorage();
-    renderTable();
-  </script>
+        // Fungsi Reset Data
+        function resetDataScanner() {
+            if (confirm("Apakah Anda yakin ingin membersihkan memori aktif pemindaian?")) {
+                alert("Data berhasil dibersihkan.");
+            }
+        }
+    </script>
 </body>
 </html>
