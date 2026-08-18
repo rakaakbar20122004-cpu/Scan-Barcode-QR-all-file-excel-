@@ -90,7 +90,6 @@
         text-align: center;
       }
 
-      /* Keterangan di bawah PT DAYA SAKTI NIAGA (Ubah Sesuai Perintah) */
       .app-title-desc {
         font-size: 14px;
         font-weight: 700;
@@ -159,7 +158,6 @@
         color: #ffffff;
         margin-bottom: 8px;
       }
-      /* Deskripsi di bawah Selamat Datang (Disesuaikan) */
       .hero-desc {
         font-size: 13px;
         color: var(--text-muted);
@@ -317,9 +315,12 @@
         color: var(--text-main);
         cursor: pointer;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      /* Statistik Hanya Total Scan (Dihapus Item Unik & Qty Sesuai Perintah) */
+      /* Box Statistik */
       .stats-single-box {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -490,6 +491,9 @@
   </head>
   <body>
 
+    <!-- CONTAINER TERSEMBUNYI UNTUK PARSING DOKUMEN GAMBAR -->
+    <div id="file-scanner-temp"></div>
+
     <!-- SIDEBAR KIRI -->
     <div class="sidebar">
       <div class="logo-box">
@@ -499,21 +503,20 @@
       </div>
       
       <div class="brand-title">PT DAYA SAKTI NIAGA</div>
-      <!-- Keterangan Baru di bawah PT DAYA SAKTI NIAGA -->
       <div class="app-title-desc">Sistem Scanner Barcode Otomatis</div>
 
       <div class="nav-menu">
         <div class="nav-item active" onclick="scrollToSection('scan-section')">
-          <span>🔳 Dashboard Scanner</span>
+          <span>01. Dashboard Scanner</span>
         </div>
         <div class="nav-item" onclick="focusDateSearch()">
-          <span>📅 Cari Per Tanggal / Hari Ini</span>
+          <span>02. Cari Per Tanggal / Hari Ini</span>
         </div>
         <div class="nav-item" onclick="openShareModal()">
-          <span>📊 Export / Share Data</span>
+          <span>03. Export / Share Data</span>
         </div>
         <div class="nav-item" onclick="confirmResetData()">
-          <span>🗑️ Reset Data Hari Ini</span>
+          <span>04. Reset Data Hari Ini</span>
         </div>
       </div>
     </div>
@@ -526,7 +529,6 @@
         <div>
           <div class="company-tag">PT DAYA SAKTI NIAGA</div>
           <div class="hero-title">Selamat Datang!</div>
-          <!-- Deskripsi Disesuaikan dengan Fungsi -->
           <div class="hero-desc">
             Manajemen dan pemindaian barcode barang secara cepat, akurat, serta terintegrasi otomatis.
           </div>
@@ -580,7 +582,7 @@
               <span id="currentDateBadge" style="font-size: 11px; color: var(--primary-cyan); font-weight:700;">Hari Ini</span>
             </div>
 
-            <!-- Box Statistik Total Scan Saja -->
+            <!-- Box Statistik Total Scan -->
             <div class="stats-single-box">
               <div>
                 <div class="stat-lbl-large">TOTAL SCAN DATA</div>
@@ -588,7 +590,7 @@
               </div>
             </div>
 
-            <!-- Filter Search & Date Picker Baru -->
+            <!-- Filter Search & Date Picker -->
             <div class="filter-row">
               <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari nama/isi barcode..." oninput="renderList()">
               <input type="date" id="dateFilterInput" class="date-picker-input" onchange="filterBySelectedDate()">
@@ -715,7 +717,7 @@
         document.getElementById("dateFilterInput").value = todayStr;
       }
 
-      // --- SEARCH PER TANGGAL (GANTI ARSIP) ---
+      // --- SEARCH PER TANGGAL ---
       function filterBySelectedDate() {
         const selectedVal = document.getElementById("dateFilterInput").value;
         if (!selectedVal) return;
@@ -772,7 +774,7 @@
         }
       }
 
-      // --- ON SCAN SUCCESS ---
+      // --- ON SCAN SUCCESS (DIPAKAI OLEH KAMERA DAN UPLOAD GAMBAR) ---
       function onScanSuccess(decodedText) {
         playBeepSound();
         triggerVisualFlash();
@@ -814,39 +816,44 @@
         todayData.unshift(newScanData);
         localStorage.setItem("nexus_today_data", JSON.stringify(todayData));
 
-        // Kembalikan view ke hari ini
+        // Reset view ke hari ini
         setTodayDatePickerDefault();
         activeViewData = [...todayData];
         document.getElementById("currentDateBadge").innerText = "Hari Ini";
 
         renderList();
-        showToast("Data Berhasil Disimpan!");
+        showToast("✅ Barcode Berhasil Terdeteksi!");
       }
 
-      // --- SENTER & UPLOAD GAMBAR ---
+      // --- FITUR UNGGAH GAMBAR (REVISI CEPAT & DIRENDER INSTAN) ---
+      async function scanFromFile(input) {
+        if (!input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+        showToast("🔍 Memproses Gambar...");
+
+        try {
+          const fileScanner = new Html5Qrcode("file-scanner-temp");
+          const decodedText = await fileScanner.scanFile(file, true);
+          
+          // Langsung jalankan handler sukses persis seperti scanner kamera
+          onScanSuccess(decodedText);
+          
+          fileScanner.clear();
+        } catch (err) {
+          alert("❌ Barcode/QR Code tidak terdeteksi pada gambar ini. Pastikan gambar cukup terang dan jelas.");
+        } finally {
+          input.value = ""; // Reset input file agar dapat digunakan kembali
+        }
+      }
+
+      // --- SENTER (FLASHLIGHT) ---
       function toggleTorch() {
         if (html5QrCode && isScanning) {
           torchOn = !torchOn;
           html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchOn }] })
             .catch(() => alert("Lampu Senter tidak didukung pada perangkat ini."));
         } else alert("Nyalakan scanner kamera terlebih dahulu.");
-      }
-
-      function scanFromFile(input) {
-        if (input.files && input.files[0]) {
-          const tempScanner = new Html5Qrcode("file-scanner-temp");
-          tempScanner.scanFile(input.files[0], true)
-            .then(decodedText => {
-              onScanSuccess(decodedText);
-              tempScanner.clear();
-              input.value = "";
-            })
-            .catch(() => {
-              alert("Tidak dapat menemukan QR Code / Barcode pada gambar tersebut.");
-              tempScanner.clear();
-              input.value = "";
-            });
-        }
       }
 
       // --- RENDER LIST DATA ---
