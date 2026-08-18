@@ -9,16 +9,13 @@
     <title>SISTEM SCANNER BARCODE OTOMATIS - PT DAYA SAKTI NIAGA</title>
 
     <!-- Pustaka Eksternal -->
-    <script
-      src="https://unpkg.com/html5-qrcode"
-      type="text/javascript"
-    ></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Font & Icon Library -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
       :root {
@@ -30,6 +27,8 @@
         --primary-glow: 0 0 20px rgba(56, 189, 248, 0.3);
         --success: #10b981;
         --danger: #ef4444;
+        --excel-color: #107c41;
+        --pdf-color: #f40f02;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
       }
@@ -50,12 +49,11 @@
         overflow-x: hidden;
       }
 
-      /* Container Tersembunyi File Scanner */
       #file-scanner-temp { display: none; }
 
       /* --- SIDEBAR KIRI --- */
       .sidebar {
-        width: 270px;
+        width: 280px;
         background: var(--sidebar-bg);
         border-right: 1px solid rgba(255, 255, 255, 0.08);
         display: flex;
@@ -66,25 +64,30 @@
         min-height: 100vh;
       }
 
+      /* Logo persis seperti gambar acuan */
       .logo-box {
-        width: 80px;
-        height: 80px;
+        width: 85px;
+        height: 85px;
         background: #ffffff;
-        border-radius: 20px;
+        border-radius: 22px;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        box-shadow: var(--primary-glow);
+        box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
         margin-bottom: 16px;
         border: 2px solid var(--primary-cyan);
+      }
+
+      .logo-box i {
+        font-size: 42px;
+        color: #0f172a;
       }
 
       .brand-title {
         font-size: 13px;
         font-weight: 800;
         color: var(--primary-cyan);
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         text-transform: uppercase;
         margin-bottom: 4px;
         text-align: center;
@@ -105,6 +108,7 @@
         flex-direction: column;
         gap: 8px;
       }
+
       .nav-item {
         display: flex;
         align-items: center;
@@ -118,10 +122,11 @@
         border: 1px solid transparent;
         transition: all 0.2s;
       }
+
       .nav-item:hover, .nav-item.active {
         background: rgba(56, 189, 248, 0.1);
         color: #ffffff;
-        border-color: rgba(56, 189, 248, 0.3);
+        border-color: rgba(56, 189, 248, 0.4);
       }
 
       /* --- KONTEN UTAMA --- */
@@ -133,7 +138,6 @@
         overflow-y: auto;
       }
 
-      /* Hero Section */
       .hero-banner {
         position: relative;
         background: linear-gradient(rgba(11, 17, 32, 0.88), rgba(11, 17, 32, 0.95)), 
@@ -144,6 +148,7 @@
         justify-content: space-between;
         align-items: center;
       }
+
       .company-tag {
         font-size: 12px;
         font-weight: 800;
@@ -152,12 +157,14 @@
         text-transform: uppercase;
         margin-bottom: 6px;
       }
+
       .hero-title {
         font-size: 26px;
         font-weight: 800;
         color: #ffffff;
         margin-bottom: 8px;
       }
+
       .hero-desc {
         font-size: 13px;
         color: var(--text-muted);
@@ -165,7 +172,6 @@
         line-height: 1.5;
       }
 
-      /* Live Clock Widget */
       .live-clock-widget {
         background: rgba(15, 23, 42, 0.8);
         border: 1px solid var(--card-border);
@@ -174,12 +180,14 @@
         text-align: right;
         backdrop-filter: blur(8px);
       }
+
       .clock-time {
         font-size: 20px;
         font-weight: 800;
         color: var(--primary-cyan);
         font-family: monospace;
       }
+
       .status-pill {
         display: inline-flex;
         align-items: center;
@@ -189,6 +197,7 @@
         font-weight: 700;
         margin-top: 2px;
       }
+
       .status-dot {
         width: 8px; height: 8px;
         background: var(--success);
@@ -196,7 +205,6 @@
         box-shadow: 0 0 8px var(--success);
       }
 
-      /* Inner Body Content Grid */
       .content-body {
         padding: 30px 40px;
         display: flex;
@@ -216,9 +224,8 @@
         border-radius: 20px;
         padding: 24px;
         backdrop-filter: blur(10px);
-        position: relative;
-        overflow: hidden;
       }
+
       .card-header-title {
         font-size: 15px;
         font-weight: 800;
@@ -229,23 +236,24 @@
         justify-content: space-between;
       }
 
-      /* Scanner Area */
       .scanner-wrapper {
         display: flex;
         flex-direction: column;
         align-items: center;
       }
+
       .scanner-container {
         background: #000;
         width: 100%;
         max-width: 360px;
-        height: 300px;
+        height: 280px;
         position: relative;
         border-radius: 20px;
         overflow: hidden;
         border: 2px solid var(--card-border);
-        transition: border-color 0.3s, box-shadow 0.3s;
+        transition: all 0.3s;
       }
+
       .scanner-container.flash-success {
         border-color: var(--success) !important;
         box-shadow: 0 0 30px rgba(16, 185, 129, 0.6) !important;
@@ -263,11 +271,13 @@
         display: none;
         z-index: 10;
       }
+
       @keyframes scanline {
         0% { top: 0; opacity: 0; }
         50% { opacity: 1; }
         100% { top: 100%; opacity: 0; }
       }
+
       .scanner-container.active .laser { display: block; }
 
       .scanner-overlay {
@@ -277,7 +287,7 @@
         z-index: 15;
       }
 
-      /* Buttons & Controls */
+      /* Tombol Utama */
       .btn-custom {
         background: var(--primary-cyan);
         color: #0b1120;
@@ -291,11 +301,13 @@
         box-shadow: var(--primary-glow);
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
       }
+
       .btn-custom:hover { opacity: 0.9; transform: translateY(-1px); }
       .btn-danger { background: var(--danger); color: white; }
-      .btn-success { background: var(--success); color: white; }
+      .btn-excel { background: var(--excel-color); color: white; box-shadow: 0 0 15px rgba(16, 124, 65, 0.4); }
+      .btn-pdf { background: var(--pdf-color); color: white; box-shadow: 0 0 15px rgba(244, 15, 2, 0.4); }
 
       .control-bar {
         display: flex;
@@ -304,6 +316,7 @@
         width: 100%;
         max-width: 360px;
       }
+
       .control-bar button, .control-bar label {
         flex: 1;
         text-align: center;
@@ -318,9 +331,9 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 6px;
       }
 
-      /* Box Statistik */
       .stats-single-box {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -328,15 +341,14 @@
         border-radius: 14px;
         text-align: center;
         margin-bottom: 16px;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
       }
+
       .stat-val-large {
         font-size: 28px;
         font-weight: 800;
         color: var(--primary-cyan);
       }
+
       .stat-lbl-large {
         font-size: 11px;
         color: var(--text-muted);
@@ -344,23 +356,13 @@
         letter-spacing: 1px;
       }
 
-      /* Search & Date Filter Area */
       .filter-row {
         display: flex;
         gap: 10px;
         margin-bottom: 14px;
       }
-      .search-input {
-        flex: 1;
-        padding: 12px 16px;
-        border-radius: 12px;
-        border: 1px solid var(--card-border);
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--text-main);
-        font-size: 13px;
-        outline: none;
-      }
-      .date-picker-input {
+
+      .search-input, .date-picker-input {
         padding: 12px;
         border-radius: 12px;
         border: 1px solid var(--card-border);
@@ -368,17 +370,16 @@
         color: var(--text-main);
         font-size: 12px;
         outline: none;
-        cursor: pointer;
       }
 
-      /* Data List */
+      .search-input { flex: 1; }
+
       .data-list-box {
-        max-height: 280px;
+        max-height: 250px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 10px;
-        padding-right: 4px;
       }
 
       .card-item {
@@ -386,8 +387,8 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 14px;
         padding: 12px 14px;
-        position: relative;
       }
+
       .data-row {
         display: flex;
         justify-content: space-between;
@@ -396,6 +397,7 @@
         border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
         padding-bottom: 4px;
       }
+
       .data-label { color: var(--text-muted); }
       .data-val { font-weight: 700; word-break: break-all; }
 
@@ -405,6 +407,7 @@
         gap: 8px;
         margin-top: 8px;
       }
+
       .btn-icon-action {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -414,16 +417,15 @@
         font-size: 11px;
         cursor: pointer;
       }
-      .btn-icon-action:hover { background: rgba(56, 189, 248, 0.2); }
 
-      /* Action Export */
       .export-bar {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 10px;
         margin-top: 16px;
       }
 
-      /* Pop-up Modals */
+      /* Modal Pop-up */
       .modal {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
@@ -434,15 +436,17 @@
         align-items: center;
         z-index: 100;
       }
+
       .modal-content {
         background: var(--sidebar-bg);
         border: 1px solid var(--card-border);
         padding: 24px;
         border-radius: 20px;
         width: 90%;
-        max-width: 400px;
+        max-width: 420px;
         color: var(--text-main);
       }
+
       .share-opt-btn {
         width: 100%;
         padding: 12px;
@@ -456,12 +460,12 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 10px;
-        justify-content: center;
+        gap: 12px;
       }
+
+      .share-opt-btn i { font-size: 18px; width: 24px; text-align: center; }
       .share-opt-btn:hover { background: rgba(56, 189, 248, 0.1); }
 
-      /* Toast Notifications */
       #toast {
         position: fixed;
         top: 20px; right: 20px;
@@ -476,13 +480,13 @@
         transition: all 0.3s;
         pointer-events: none;
       }
-      #toast.show { opacity: 1; transform: translateY(0); }
 
-      /* Media Query Mobile */
+      #toast.show { opacity: 1; }
+
       @media (max-width: 900px) {
         body { flex-direction: column; }
-        .sidebar { width: 100%; min-height: auto; padding: 20px; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .hero-banner { flex-direction: column; align-items: flex-start; gap: 16px; padding: 25px 20px; }
+        .sidebar { width: 100%; min-height: auto; padding: 20px; }
+        .hero-banner { flex-direction: column; align-items: flex-start; gap: 16px; }
         .live-clock-widget { width: 100%; text-align: left; }
         .content-body { padding: 20px; }
         .dashboard-grid { grid-template-columns: 1fr; }
@@ -491,15 +495,13 @@
   </head>
   <body>
 
-    <!-- CONTAINER TERSEMBUNYI UNTUK PARSING DOKUMEN GAMBAR -->
     <div id="file-scanner-temp"></div>
 
     <!-- SIDEBAR KIRI -->
     <div class="sidebar">
+      <!-- Logo Layer Sesuai Foto Acuan -->
       <div class="logo-box">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0b1120" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-        </svg>
+        <i class="fa-solid fa-layer-group"></i>
       </div>
       
       <div class="brand-title">PT DAYA SAKTI NIAGA</div>
@@ -507,15 +509,19 @@
 
       <div class="nav-menu">
         <div class="nav-item active" onclick="scrollToSection('scan-section')">
+          <i class="fa-solid fa-qrcode"></i>
           <span>01. Dashboard Scanner</span>
         </div>
         <div class="nav-item" onclick="focusDateSearch()">
+          <i class="fa-solid fa-calendar-days"></i>
           <span>02. Cari Per Tanggal / Hari Ini</span>
         </div>
         <div class="nav-item" onclick="openShareModal()">
+          <i class="fa-solid fa-share-nodes"></i>
           <span>03. Export / Share Data</span>
         </div>
         <div class="nav-item" onclick="confirmResetData()">
+          <i class="fa-solid fa-trash-arrow-up"></i>
           <span>04. Reset Data Hari Ini</span>
         </div>
       </div>
@@ -524,7 +530,6 @@
     <!-- KONTEN UTAMA KANAN -->
     <div class="main-wrapper">
 
-      <!-- HERO BANNER -->
       <div class="hero-banner">
         <div>
           <div class="company-tag">PT DAYA SAKTI NIAGA</div>
@@ -534,7 +539,6 @@
           </div>
         </div>
 
-        <!-- Live Clock & Status Indicator -->
         <div class="live-clock-widget">
           <div class="clock-time" id="liveClock">00:00:00</div>
           <div class="status-pill">
@@ -544,17 +548,16 @@
         </div>
       </div>
 
-      <!-- INNER BODY CONTENT -->
       <div class="content-body">
-
-        <!-- DASHBOARD GRID -->
         <div class="dashboard-grid">
 
-          <!-- KOTAK 1: AREA SCANNER -->
+          <!-- KOTAK 1: SCANNER AREA -->
           <div class="dash-card" id="scan-section">
             <div class="card-header-title">
-              <span>📷 Area Scanner Barcode</span>
-              <button class="btn-icon-action" onclick="toggleAudioMute()" id="muteBtn">🔊 Audio: ON</button>
+              <span><i class="fa-solid fa-camera"></i> Area Scanner Barcode</span>
+              <button class="btn-icon-action" onclick="toggleAudioMute()" id="muteBtn">
+                <i class="fa-solid fa-volume-high"></i> Audio: ON
+              </button>
             </div>
             
             <div class="scanner-wrapper">
@@ -562,76 +565,98 @@
                 <div class="laser"></div>
                 <div id="reader"></div>
                 <div class="scanner-overlay">
-                  <button class="btn-custom" id="camToggleBtn" onclick="toggleScanner()">📷 Mulai Scanner</button>
+                  <button class="btn-custom" id="camToggleBtn" onclick="toggleScanner()">
+                    <i class="fa-solid fa-camera"></i> Mulai Scanner
+                  </button>
                 </div>
               </div>
 
-              <!-- Controls Bar -->
               <div class="control-bar">
-                <button onclick="toggleTorch()">🔦 Senter ON/OFF</button>
-                <label for="qrFileInput">🖼️ Upload Gambar</label>
+                <button onclick="toggleTorch()"><i class="fa-solid fa-bolt"></i> Senter ON/OFF</button>
+                <label for="qrFileInput"><i class="fa-solid fa-image"></i> Upload Gambar</label>
                 <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="scanFromFile(this)">
               </div>
             </div>
           </div>
 
-          <!-- KOTAK 2: RIWAYAT & FILTER PER TANGGAL -->
+          <!-- KOTAK 2: DATA HASIL SCAN -->
           <div class="dash-card">
             <div class="card-header-title">
-              <span>📊 Data Hasil Scan</span>
+              <span><i class="fa-solid fa-chart-line"></i> Data Hasil Scan</span>
               <span id="currentDateBadge" style="font-size: 11px; color: var(--primary-cyan); font-weight:700;">Hari Ini</span>
             </div>
 
-            <!-- Box Statistik Total Scan -->
             <div class="stats-single-box">
-              <div>
-                <div class="stat-lbl-large">TOTAL SCAN DATA</div>
-                <div class="stat-val-large" id="statTotalScan">0</div>
-              </div>
+              <div class="stat-lbl-large">TOTAL SCAN DATA</div>
+              <div class="stat-val-large" id="statTotalScan">0</div>
             </div>
 
-            <!-- Filter Search & Date Picker -->
             <div class="filter-row">
-              <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari nama/isi barcode..." oninput="renderList()">
+              <input type="text" id="searchInput" class="search-input" placeholder="🔍 Cari data..." oninput="renderList()">
               <input type="date" id="dateFilterInput" class="date-picker-input" onchange="filterBySelectedDate()">
             </div>
 
-            <!-- Data List -->
             <div class="data-list-box" id="scanList"></div>
 
-            <!-- Export Actions -->
+            <!-- DUA TOMBOL UTAMA: EXCEL & PDF -->
             <div class="export-bar">
-              <button class="btn-custom btn-success" style="flex:1;" onclick="openShareModal()">📤 Export & Share Excel</button>
-              <button class="btn-custom" onclick="printReportPDF()">🖨️ Cetak Laporan</button>
+              <button class="btn-custom btn-excel" onclick="exportToExcel()">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
+              </button>
+              <button class="btn-custom btn-pdf" onclick="exportToPDF()">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+              </button>
             </div>
           </div>
 
         </div>
-
       </div>
-
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast">✅ Notification</div>
+    <div id="toast">✅ Notifikasi</div>
 
-    <!-- MODAL SHARE EXCEL & WHATSAPP -->
+    <!-- MODAL SHARE DENGAN LOGO GAMBAR EXCEL DAN PDF LENGKAP -->
     <div class="modal" id="shareModal">
       <div class="modal-content">
-        <h3 style="font-size: 16px; margin-bottom: 16px; text-align:center;">Opsi Export & Share</h3>
+        <h3 style="font-size: 16px; margin-bottom: 16px; text-align:center;">Opsi Export & Share Data</h3>
         
-        <button class="share-opt-btn" onclick="exportToExcel(); closeShareModal();">
-          📥 Download File Excel (.xlsx)
+        <button class="share-opt-btn" style="border-color: var(--excel-color);" onclick="exportToExcel(); closeShareModal();">
+          <i class="fa-solid fa-file-excel" style="color: #107c41;"></i> Download File Excel (.xlsx)
         </button>
-        <button class="share-opt-btn" style="border-color: #25D366; color: #25D366;" onclick="shareViaWhatsApp(); closeShareModal();">
-          💬 Share Ringkasan via WhatsApp
+
+        <button class="share-opt-btn" style="border-color: var(--pdf-color);" onclick="exportToPDF(); closeShareModal();">
+          <i class="fa-solid fa-file-pdf" style="color: #f40f02;"></i> Download File PDF (.pdf)
         </button>
-        <button class="share-opt-btn" onclick="shareData(); closeShareModal();">
-          🔗 Share File Sistem (Web Share API)
+
+        <button class="share-opt-btn" style="border-color: #25D366;" onclick="shareViaWhatsApp(); closeShareModal();">
+          <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> Share Ringkasan via WhatsApp
+        </button>
+
+        <button class="share-opt-btn" onclick="shareDataFiles(); closeShareModal();">
+          <i class="fa-solid fa-share-nodes" style="color: var(--primary-cyan);"></i> Share Document (Web Share API)
         </button>
         
-        <button class="btn-custom btn-danger" style="width: 100%; margin-top: 10px;" onclick="closeShareModal()">Batal</button>
+        <button class="btn-custom btn-danger" style="width: 100%; margin-top: 10px; justify-content:center;" onclick="closeShareModal()">Batal</button>
       </div>
+    </div>
+
+    <!-- TEMPLATE LAPORAN TERSEMBUNYI UNTUK EXPORT PDF -->
+    <div id="pdfReportTemplate" style="display:none; padding:20px; background:#fff; color:#000;">
+      <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:15px;">
+        <h2 style="margin:0; font-size:18px;">PT DAYA SAKTI NIAGA</h2>
+        <p style="margin:5px 0 0; font-size:12px;">Laporan Hasil Pemindaian Barcode Otomatis</p>
+        <p id="pdfReportDate" style="margin:2px 0 0; font-size:11px; color:#555;"></p>
+      </div>
+      <table style="width:100%; border-collapse:collapse; font-size:11px;" border="1" cellpadding="6">
+        <thead>
+          <tr style="background:#f2f2f2;">
+            <th width="10%">No</th>
+            <th>Isi Barcode / Data</th>
+            <th width="25%">Waktu Scan</th>
+          </tr>
+        </thead>
+        <tbody id="pdfReportBody"></tbody>
+      </table>
     </div>
 
     <script>
@@ -649,7 +674,6 @@
         setTodayDatePickerDefault();
       };
 
-      // --- JAM REAL-TIME ---
       function startLiveClock() {
         setInterval(() => {
           const now = new Date();
@@ -657,7 +681,6 @@
         }, 1000);
       }
 
-      // --- AUDIO & FLASH FEEDBACK ---
       function playBeepSound() {
         if (isMuted) return;
         try {
@@ -682,10 +705,11 @@
 
       function toggleAudioMute() {
         isMuted = !isMuted;
-        document.getElementById("muteBtn").innerText = isMuted ? "🔇 Audio: OFF" : "🔊 Audio: ON";
+        document.getElementById("muteBtn").innerHTML = isMuted 
+          ? '<i class="fa-solid fa-volume-xmark"></i> Audio: OFF' 
+          : '<i class="fa-solid fa-volume-high"></i> Audio: ON';
       }
 
-      // --- MANAJEMEN DATA & RESET HARIAN ---
       function getFormattedDate(d = new Date()) {
         return d.toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
       }
@@ -717,7 +741,6 @@
         document.getElementById("dateFilterInput").value = todayStr;
       }
 
-      // --- SEARCH PER TANGGAL ---
       function filterBySelectedDate() {
         const selectedVal = document.getElementById("dateFilterInput").value;
         if (!selectedVal) return;
@@ -739,10 +762,9 @@
 
       function focusDateSearch() {
         document.getElementById("dateFilterInput").focus();
-        showToast("📅 Silakan pilih tanggal scan");
+        showToast("📅 Pilih tanggal scan data");
       }
 
-      // --- SCANNER CONTROLLER ---
       function toggleScanner() {
         if (isScanning) stopScanner();
         else startScanner();
@@ -756,38 +778,35 @@
         html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
           .then(() => {
             isScanning = true;
-            document.getElementById("camToggleBtn").innerText = "❌ Tutup Scanner";
+            document.getElementById("camToggleBtn").innerHTML = '<i class="fa-solid fa-xmark"></i> Tutup Scanner';
             document.getElementById("camToggleBtn").className = "btn-custom btn-danger";
             document.getElementById("scanBox").classList.add("active");
           })
-          .catch(() => alert("Kamera gagal diakses. Pastikan izin kamera aktif."));
+          .catch(() => alert("Kamera tidak dapat diakses. Mohon beri izin akses kamera."));
       }
 
       function stopScanner() {
         if (html5QrCode && isScanning) {
           html5QrCode.stop().then(() => {
             isScanning = false;
-            document.getElementById("camToggleBtn").innerText = "📷 Mulai Scanner";
+            document.getElementById("camToggleBtn").innerHTML = '<i class="fa-solid fa-camera"></i> Mulai Scanner';
             document.getElementById("camToggleBtn").className = "btn-custom";
             document.getElementById("scanBox").classList.remove("active");
           });
         }
       }
 
-      // --- ON SCAN SUCCESS (DIPAKAI OLEH KAMERA DAN UPLOAD GAMBAR) ---
       function onScanSuccess(decodedText) {
         playBeepSound();
         triggerVisualFlash();
         if (navigator.vibrate) navigator.vibrate([100]);
 
-        // Cek Duplikat
         const isDuplicate = todayData.some(item => item.rawText === decodedText);
         if (isDuplicate) {
-          showToast("⚠️ Peringatan: Data ini sudah di-scan!");
+          showToast("⚠️ Peringatan: Data sudah di-scan!");
           return;
         }
 
-        // Parse Data
         let fields = [];
         let firstVal = decodedText;
         let lines = decodedText.split(/\r?\n/);
@@ -816,7 +835,6 @@
         todayData.unshift(newScanData);
         localStorage.setItem("nexus_today_data", JSON.stringify(todayData));
 
-        // Reset view ke hari ini
         setTodayDatePickerDefault();
         activeViewData = [...todayData];
         document.getElementById("currentDateBadge").innerText = "Hari Ini";
@@ -825,38 +843,32 @@
         showToast("✅ Barcode Berhasil Terdeteksi!");
       }
 
-      // --- FITUR UNGGAH GAMBAR (REVISI CEPAT & DIRENDER INSTAN) ---
       async function scanFromFile(input) {
         if (!input.files || input.files.length === 0) return;
 
         const file = input.files[0];
-        showToast("🔍 Memproses Gambar...");
+        showToast("🔍 Mendeteksi Gambar...");
 
         try {
           const fileScanner = new Html5Qrcode("file-scanner-temp");
           const decodedText = await fileScanner.scanFile(file, true);
-          
-          // Langsung jalankan handler sukses persis seperti scanner kamera
           onScanSuccess(decodedText);
-          
           fileScanner.clear();
         } catch (err) {
-          alert("❌ Barcode/QR Code tidak terdeteksi pada gambar ini. Pastikan gambar cukup terang dan jelas.");
+          alert("❌ Barcode/QR Code tidak terdeteksi pada gambar ini.");
         } finally {
-          input.value = ""; // Reset input file agar dapat digunakan kembali
+          input.value = "";
         }
       }
 
-      // --- SENTER (FLASHLIGHT) ---
       function toggleTorch() {
         if (html5QrCode && isScanning) {
           torchOn = !torchOn;
           html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchOn }] })
-            .catch(() => alert("Lampu Senter tidak didukung pada perangkat ini."));
+            .catch(() => alert("Senter tidak tersedia pada perangkat ini."));
         } else alert("Nyalakan scanner kamera terlebih dahulu.");
       }
 
-      // --- RENDER LIST DATA ---
       function renderList() {
         const container = document.getElementById("scanList");
         const searchQuery = document.getElementById("searchInput").value.toLowerCase();
@@ -868,7 +880,7 @@
         });
 
         if (filteredData.length === 0) {
-          container.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-muted); font-size:12px;">Data tidak ditemukan pada tanggal ini.</div>`;
+          container.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-muted); font-size:12px;">Data tidak ditemukan.</div>`;
           return;
         }
 
@@ -886,8 +898,8 @@
               ${rowsHtml}
               <div class="data-row"><span class="data-label">Waktu Scan</span><span class="data-val">${item.time}</span></div>
               <div class="card-action-bar">
-                <button class="btn-icon-action" onclick="copyToClipboard('${encodeURIComponent(item.rawText)}')">📋 Copy Teks</button>
-                <button class="btn-icon-action" style="color:var(--danger);" onclick="deleteCard(${item.id})">🗑️ Hapus</button>
+                <button class="btn-icon-action" onclick="copyToClipboard('${encodeURIComponent(item.rawText)}')"><i class="fa-regular fa-copy"></i> Copy</button>
+                <button class="btn-icon-action" style="color:var(--danger);" onclick="deleteCard(${item.id})"><i class="fa-solid fa-trash"></i> Hapus</button>
               </div>
             </div>
           `;
@@ -896,7 +908,7 @@
 
       function copyToClipboard(encodedText) {
         const text = decodeURIComponent(encodedText);
-        navigator.clipboard.writeText(text).then(() => showToast("📋 Teks berhasil disalin!"));
+        navigator.clipboard.writeText(text).then(() => showToast("📋 Teks disalin!"));
       }
 
       function deleteCard(id) {
@@ -910,18 +922,17 @@
       }
 
       function confirmResetData() {
-        if (confirm("Apakah Anda yakin ingin mengosongkan seluruh data hasil scan HARI INI?")) {
+        if (confirm("Apakah Anda yakin ingin menghapus data scan HARI INI?")) {
           todayData = [];
           activeViewData = [];
           localStorage.setItem("nexus_today_data", JSON.stringify([]));
           renderList();
-          showToast("🧹 Data Hari Ini Telah Dikosongkan!");
+          showToast("🧹 Data Dikosongkan!");
         }
       }
 
-      // --- EXPORT & SHARE LOGIC ---
       function openShareModal() {
-        if (activeViewData.length === 0) return alert("⚠️ Data masih kosong pada tanggal ini.");
+        if (activeViewData.length === 0) return alert("⚠️ Data masih kosong.");
         document.getElementById("shareModal").style.display = "flex";
       }
 
@@ -942,7 +953,9 @@
         });
       }
 
+      /* EXPORT EXCEL */
       function exportToExcel() {
+        if (activeViewData.length === 0) return alert("Data kosong.");
         const excelData = prepareExcelData(activeViewData);
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
@@ -957,20 +970,55 @@
         a.download = `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.xlsx`;
         a.click();
         window.URL.revokeObjectURL(url);
+        showToast("📊 Berhasil Unduh Excel!");
+      }
+
+      /* FITUR EXPORT PDF BERGAMBAR PDF */
+      function exportToPDF() {
+        if (activeViewData.length === 0) return alert("Data kosong.");
+
+        showToast("📄 Membuat file PDF...");
+
+        document.getElementById("pdfReportDate").innerText = `Tanggal Laporan: ${getFormattedDate()}`;
+        const pdfTbody = document.getElementById("pdfReportBody");
+        pdfTbody.innerHTML = "";
+
+        activeViewData.forEach((item, index) => {
+          pdfTbody.innerHTML += `
+            <tr>
+              <td style="text-align:center;">${index + 1}</td>
+              <td>${item.rawText.replace(/\n/g, '<br>')}</td>
+              <td>${item.time}</td>
+            </tr>
+          `;
+        });
+
+        const element = document.getElementById("pdfReportTemplate");
+        element.style.display = "block";
+
+        const opt = {
+          margin:       10,
+          filename:     `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.pdf`,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2 },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+          element.style.display = "none";
+          showToast("📄 Berhasil Unduh PDF!");
+        });
       }
 
       function shareViaWhatsApp() {
         let text = `*LAPORAN HASIL SCAN BARCODE*\n*PT DAYA SAKTI NIAGA*\nTanggal: ${getFormattedDate()}\nTotal Data: ${activeViewData.length}\n-----------------------------------\n\n`;
-        
         activeViewData.forEach((item, index) => {
-          text += `*${index + 1}. ${item.firstVal}*\n`;
-          text += `Jam: ${item.time}\n\n`;
+          text += `*${index + 1}. ${item.firstVal}*\nJam: ${item.time}\n\n`;
         });
-
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
       }
 
-      async function shareData() {
+      async function shareDataFiles() {
         const excelData = prepareExcelData(activeViewData);
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
@@ -982,47 +1030,9 @@
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try { await navigator.share({ files: [file], title: "Laporan Scan Barcode" }); } catch (e) {}
-        } else alert("Gunakan opsi 'Download File Excel' atau 'Share via WhatsApp'.");
+        } else alert("Fitur Share file tidak didukung browser ini, silakan gunakan tombol Excel/PDF.");
       }
 
-      // --- CETAK LAPORAN PDF ---
-      function printReportPDF() {
-        if (activeViewData.length === 0) return alert("Tidak ada data untuk dicetak.");
-
-        let printWindow = window.open('', '', 'height=600,width=800');
-        let html = `
-          <html>
-            <head>
-              <title>Laporan Scan Barcode - PT DAYA SAKTI NIAGA</title>
-              <style>
-                body { font-family: sans-serif; padding: 20px; color: #000; }
-                h2 { margin-bottom: 2px; }
-                p { font-size: 12px; color: #555; margin-top: 0; }
-                table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                th, td { border: 1px solid #ccc; padding: 8px; font-size: 11px; text-align: left; }
-                th { background: #f2f2f2; }
-              </style>
-            </head>
-            <body>
-              <h2>PT DAYA SAKTI NIAGA</h2>
-              <p>Laporan Hasil Pemindaian Barcode - Tanggal: ${getFormattedDate()}</p>
-              <table>
-                <thead>
-                  <tr><th>No</th><th>Isi Barcode</th><th>Jam Scan</th></tr>
-                </thead>
-                <tbody>
-                  ${activeViewData.map((item, i) => `<tr><td>${i+1}</td><td>${item.rawText}</td><td>${item.time}</td></tr>`).join('')}
-                </tbody>
-              </table>
-            </body>
-          </html>
-        `;
-        printWindow.document.write(html);
-        printWindow.document.close();
-        printWindow.print();
-      }
-
-      // --- UTILS ---
       function scrollToSection(id) {
         document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
       }
