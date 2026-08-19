@@ -19,9 +19,9 @@
 
     <style>
       :root {
-        --bg-main: #0b1120;
-        --sidebar-bg: #0f172a;
-        --card-bg: rgba(15, 23, 42, 0.85);
+        --bg-main: #060913;
+        --sidebar-bg: rgba(15, 23, 42, 0.92);
+        --card-bg: rgba(15, 23, 42, 0.75);
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
         
@@ -42,6 +42,13 @@
 
       body {
         background-color: var(--bg-main);
+        /* Gambar Latar Lapangan Kerja / Pabrik Modern */
+        background-image: 
+          radial-gradient(circle at 50% 30%, rgba(6, 9, 19, 0.75) 0%, rgba(6, 9, 19, 0.95) 100%),
+          url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1920&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         color: var(--text-main);
         min-height: 100vh;
         display: flex;
@@ -54,11 +61,13 @@
       /* --- HEADER BRANDING --- */
       .app-header {
         background: var(--sidebar-bg);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0, 243, 255, 0.15);
         padding: 14px 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
       }
 
       .brand-box {
@@ -77,7 +86,7 @@
         justify-content: center;
         color: #0f172a;
         font-size: 20px;
-        box-shadow: 0 0 12px var(--neon-cyan);
+        box-shadow: 0 0 15px var(--neon-cyan);
       }
 
       .company-title {
@@ -123,7 +132,7 @@
         to { opacity: 1; transform: translateY(0); }
       }
 
-      /* --- GRID MENU UTAMA --- */
+      /* --- GRID MENU UTAMA & EFEK BAYANGAN --- */
       .grid-menu-container {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -133,6 +142,7 @@
 
       .neon-card {
         background: var(--card-bg);
+        backdrop-filter: blur(12px);
         border-radius: 20px;
         padding: 28px 16px;
         display: flex;
@@ -141,7 +151,7 @@
         justify-content: center;
         text-align: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         min-height: 150px;
       }
@@ -149,23 +159,39 @@
       .neon-card:active { transform: scale(0.97); }
 
       .neon-card.cyan-border {
-        border: 2px solid var(--neon-cyan);
-        box-shadow: 0 0 18px rgba(0, 243, 255, 0.25);
+        border: 1px solid rgba(0, 243, 255, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 243, 255, 0.2);
+      }
+      .neon-card.cyan-border:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 243, 255, 0.4);
       }
 
       .neon-card.green-border {
-        border: 2px solid var(--neon-green);
-        box-shadow: 0 0 18px rgba(16, 185, 129, 0.25);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.2);
+      }
+      .neon-card.green-border:hover {
+        border-color: var(--neon-green);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.4);
       }
 
       .neon-card.purple-border {
-        border: 2px solid var(--neon-purple);
-        box-shadow: 0 0 18px rgba(168, 85, 247, 0.25);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(168, 85, 247, 0.2);
+      }
+      .neon-card.purple-border:hover {
+        border-color: var(--neon-purple);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.4);
       }
 
       .neon-card.red-border {
-        border: 2px solid var(--neon-red);
-        box-shadow: 0 0 18px rgba(244, 63, 94, 0.25);
+        border: 1px solid rgba(244, 63, 94, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(244, 63, 94, 0.2);
+      }
+      .neon-card.red-border:hover {
+        border-color: var(--neon-red);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(244, 63, 94, 0.4);
       }
 
       .card-icon {
@@ -173,10 +199,10 @@
         margin-bottom: 12px;
       }
 
-      .cyan-border .card-icon { color: var(--neon-cyan); }
-      .green-border .card-icon { color: var(--neon-green); }
-      .purple-border .card-icon { color: var(--neon-purple); }
-      .red-border .card-icon { color: var(--neon-red); }
+      .cyan-border .card-icon { color: var(--neon-cyan); filter: drop-shadow(0 0 8px var(--neon-cyan)); }
+      .green-border .card-icon { color: var(--neon-green); filter: drop-shadow(0 0 8px var(--neon-green)); }
+      .purple-border .card-icon { color: var(--neon-purple); filter: drop-shadow(0 0 8px var(--neon-purple)); }
+      .red-border .card-icon { color: var(--neon-red); filter: drop-shadow(0 0 8px var(--neon-red)); }
 
       .card-title {
         font-size: 15px;
@@ -202,8 +228,9 @@
       }
 
       .btn-back {
-        background: rgba(255, 255, 255, 0.08);
+        background: rgba(15, 23, 42, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
         color: #fff;
         padding: 8px 14px;
         border-radius: 12px;
@@ -214,6 +241,7 @@
         align-items: center;
         gap: 8px;
         white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
 
       /* --- AREA SCANNER --- */
@@ -227,18 +255,18 @@
         background: #000;
         width: 100%;
         max-width: 480px;
-        height: 380px; /* Diperbesar agar leluasa */
+        height: 380px;
         position: relative;
         border-radius: 20px;
         overflow: hidden;
         border: 2px solid var(--neon-cyan);
-        box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 243, 255, 0.3);
         transition: all 0.2s;
       }
 
       .scanner-container.flash-success {
         border-color: var(--neon-green) !important;
-        box-shadow: 0 0 40px var(--neon-green) !important;
+        box-shadow: 0 0 50px var(--neon-green) !important;
       }
 
       #reader { width: 100%; height: 100%; }
@@ -278,13 +306,13 @@
         font-size: 13px;
         font-weight: 800;
         cursor: pointer;
-        box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
         display: inline-flex;
         align-items: center;
         gap: 8px;
       }
 
-      .btn-danger { background: var(--neon-red); color: white; box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+      .btn-danger { background: var(--neon-red); color: white; box-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
 
       .control-bar {
         display: flex;
@@ -300,8 +328,9 @@
         font-size: 12px;
         padding: 12px;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         color: var(--text-main);
         cursor: pointer;
         font-weight: 700;
@@ -309,18 +338,21 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
       }
 
       .stats-single-box {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         padding: 16px;
         border-radius: 16px;
         text-align: center;
         margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       }
 
-      .stat-val-large { font-size: 32px; font-weight: 800; color: var(--neon-cyan); }
+      .stat-val-large { font-size: 32px; font-weight: 800; color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
       .stat-lbl-large { font-size: 11px; color: var(--text-muted); font-weight: 800; letter-spacing: 1px; }
 
       .filter-row { display: flex; gap: 10px; margin-bottom: 14px; }
@@ -329,7 +361,7 @@
         padding: 12px;
         border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(15, 23, 42, 0.8);
         color: var(--text-main);
         font-size: 13px;
         outline: none;
@@ -346,10 +378,12 @@
       }
 
       .card-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 14px;
         padding: 12px 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
       }
 
       .data-row {
@@ -367,8 +401,8 @@
       .card-action-bar { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
 
       .btn-icon-action {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         color: var(--text-main);
         border-radius: 8px;
         padding: 6px 12px;
@@ -377,7 +411,7 @@
         font-weight: 700;
       }
 
-      /* --- TOMBOL SHARE KHUSUS DI BAWAH HASIL SCAN --- */
+      /* --- TOMBOL EXPORT DI BAWAH HASIL SCAN --- */
       .share-action-container {
         margin-top: 16px;
         display: flex;
@@ -389,7 +423,8 @@
         padding: 14px;
         border-radius: 14px;
         border: 1px solid var(--neon-purple);
-        background: rgba(168, 85, 247, 0.12);
+        background: rgba(168, 85, 247, 0.2);
+        backdrop-filter: blur(8px);
         color: #ffffff;
         font-weight: 800;
         font-size: 13px;
@@ -398,13 +433,13 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(168, 85, 247, 0.3);
         transition: all 0.2s ease;
       }
 
       .btn-share-inline:active {
         transform: scale(0.97);
-        background: rgba(168, 85, 247, 0.25);
+        background: rgba(168, 85, 247, 0.35);
       }
 
       /* MODAL DIALOG */
@@ -427,7 +462,7 @@
         width: 90%;
         max-width: 380px;
         color: var(--text-main);
-        box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        box-shadow: 0 0 35px rgba(0, 243, 255, 0.4);
       }
 
       .share-opt-btn {
@@ -462,7 +497,7 @@
         opacity: 0;
         transition: all 0.3s ease;
         pointer-events: none;
-        box-shadow: 0 0 20px var(--neon-green);
+        box-shadow: 0 0 25px var(--neon-green);
         text-align: center;
         width: max-content;
         max-width: 90%;
@@ -496,7 +531,7 @@
 
       <!-- ================= HALAMAN 1: HOME MENU ================= -->
       <div class="page-view active" id="page-home">
-        <h2 style="font-size: 18px; text-align: center; margin-top: 10px;">Menu Utama Operasional</h2>
+        <h2 style="font-size: 18px; text-align: center; margin-top: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Menu Utama Operasional</h2>
         <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 10px;">Pilih opsi untuk membuka halaman terkait</p>
 
         <div class="grid-menu-container">
@@ -514,7 +549,7 @@
 
           <div class="neon-card purple-border" onclick="switchPage('page-export')">
             <i class="fa-solid fa-share-nodes card-icon"></i>
-            <div class="card-title">Export / Share Data</div>
+            <div class="card-title">Export Data</div>
             <div class="card-desc">Unduh / kirim file Excel & PDF</div>
           </div>
 
@@ -560,13 +595,13 @@
           <!-- HASIL LIST SCAN -->
           <div class="data-list-box" id="scanListHome"></div>
 
-          <!-- TOMBOL SHARE LANGSUNG DI BAWAH HASIL SCAN -->
+          <!-- TOMBOL EXPORT LANGSUNG DI BAWAH HASIL SCAN -->
           <div class="share-action-container">
             <button class="btn-share-inline" onclick="openExcelOptionsModal()">
-              <i class="fa-solid fa-file-excel" style="color: var(--neon-green);"></i> Share / Export Excel
+              <i class="fa-solid fa-file-excel" style="color: var(--neon-green);"></i> Export Excel
             </button>
             <button class="btn-share-inline" onclick="openPDFOptionsModal()">
-              <i class="fa-solid fa-file-pdf" style="color: var(--neon-red);"></i> Share / Export PDF
+              <i class="fa-solid fa-file-pdf" style="color: var(--neon-red);"></i> Export PDF
             </button>
           </div>
         </div>
@@ -593,21 +628,21 @@
 
         <div class="share-action-container">
           <button class="btn-share-inline" onclick="openExcelOptionsModal()">
-            <i class="fa-solid fa-file-excel" style="color: var(--neon-green);"></i> Share / Export Excel
+            <i class="fa-solid fa-file-excel" style="color: var(--neon-green);"></i> Export Excel
           </button>
           <button class="btn-share-inline" onclick="openPDFOptionsModal()">
-            <i class="fa-solid fa-file-pdf" style="color: var(--neon-red);"></i> Share / Export PDF
+            <i class="fa-solid fa-file-pdf" style="color: var(--neon-red);"></i> Export PDF
           </button>
         </div>
       </div>
 
-      <!-- ================= HALAMAN 4: EXPORT / SHARE DATA ================= -->
+      <!-- ================= HALAMAN 4: EXPORT DATA ================= -->
       <div class="page-view" id="page-export">
         <div class="page-header-nav">
           <button class="btn-back" onclick="switchPage('page-home')"><i class="fa-solid fa-arrow-left"></i> Kembali ke Menu Utama</button>
         </div>
 
-        <h3 style="text-align: center; margin-bottom: 20px;">Pilih Format Laporan Data</h3>
+        <h3 style="text-align: center; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Pilih Format Laporan Data</h3>
 
         <div class="grid-menu-container">
           <div class="neon-card green-border" onclick="openExcelOptionsModal()">
@@ -639,7 +674,7 @@
         </button>
 
         <button class="share-opt-btn" onclick="shareExcelFile(); closeModals();">
-          <i class="fa-brands fa-whatsapp" style="color: var(--neon-green);"></i> Kirim File via WhatsApp / Apps Lain
+          <i class="fa-brands fa-whatsapp" style="color: var(--neon-green);"></i> Kirim File via WhatsApp
         </button>
         
         <button class="btn-custom btn-danger" style="width: 100%; margin-top: 10px; justify-content:center;" onclick="closeModals()">Batal</button>
@@ -656,7 +691,7 @@
         </button>
 
         <button class="share-opt-btn" onclick="sharePDFFile(); closeModals();">
-          <i class="fa-brands fa-whatsapp" style="color: var(--neon-green);"></i> Kirim File via WhatsApp / Apps Lain
+          <i class="fa-brands fa-whatsapp" style="color: var(--neon-green);"></i> Kirim File via WhatsApp
         </button>
         
         <button class="btn-custom btn-danger" style="width: 100%; margin-top: 10px; justify-content:center;" onclick="closeModals()">Batal</button>
@@ -670,12 +705,14 @@
         <p style="margin:5px 0 0; font-size:12px;">Laporan Hasil Pemindaian Barcode Otomatis</p>
         <p id="pdfReportDate" style="margin:2px 0 0; font-size:11px; color:#555;"></p>
       </div>
+
+      <div id="pdfReportMeta" style="font-size: 11px; margin-bottom: 12px; font-weight: bold; color: #333;"></div>
+
       <table style="width:100%; border-collapse:collapse; font-size:11px;" border="1" cellpadding="6">
         <thead>
           <tr style="background:#f2f2f2;">
-            <th width="10%">No</th>
-            <th>Isi Barcode / Data</th>
-            <th width="25%">Waktu Scan</th>
+            <th width="12%">No</th>
+            <th>Isi Barcode / Data Detail</th>
           </tr>
         </thead>
         <tbody id="pdfReportBody"></tbody>
@@ -825,19 +862,17 @@
       function startScanner() {
         if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
 
-        // MEMBUAT AREA BINGKAI KOTAK (QRBOX) DIBUAT ULTRA SANGAT BESAR (85% LAYAR)
         const qrboxFunction = function(viewfinderWidth, viewfinderHeight) {
           let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-          let qrboxSize = Math.floor(minEdgeSize * 0.85); // 85% Sangat Luas
+          let qrboxSize = Math.floor(minEdgeSize * 0.85);
           return {
             width: qrboxSize,
             height: qrboxSize
           };
         };
 
-        // KONFIGURASI SCANNER SUPER FAST & ZERO DELAY
         const config = { 
-          fps: 30, // Kamera bekerja 30 Frame/Detik (Ultra Responsif)
+          fps: 30,
           qrbox: qrboxFunction,
           disableFlip: false
         };
@@ -865,7 +900,6 @@
 
       function onScanSuccess(decodedText) {
         const now = Date.now();
-        // Mencegah pembacaan berulang instan pada barcode yang sama dalam kurun 1.5 detik
         if (decodedText === lastScannedText && (now - lastScannedTime) < 1500) {
           return;
         }
@@ -1009,7 +1043,7 @@
         }
       }
 
-      /* EXPORT & SHARE MODALS */
+      /* EXPORT MODALS */
       function openExcelOptionsModal() {
         if (activeViewData.length === 0) return alert("⚠️ Data masih kosong.");
         document.getElementById("excelModal").style.display = "flex";
@@ -1033,24 +1067,79 @@
           } else {
             rowObj["Raw Data"] = item.rawText;
           }
-          rowObj["Waktu Scan"] = item.time;
           return rowObj;
         });
       }
 
-      function exportToExcel() {
+      async function saveFileWithPicker(blobData, defaultFilename, mimeType, extension) {
+        if ('showSaveFilePicker' in window) {
+          try {
+            const handle = await window.showSaveFilePicker({
+              suggestedName: defaultFilename,
+              types: [{
+                description: 'File Laporan',
+                accept: { [mimeType]: [extension] },
+              }],
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blobData);
+            await writable.close();
+            showToast("📊 File Berhasil Disimpan di Lokasi Pilihan!");
+            return true;
+          } catch (err) {
+            if (err.name === 'AbortError') return false;
+          }
+        }
+
+        const url = URL.createObjectURL(blobData);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = defaultFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("📊 Berhasil Mengunduh File!");
+      }
+
+      async function exportToExcel() {
         const excelData = prepareExcelData(activeViewData);
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        
+        const headerInfo = [
+          ["PT DAYA SAKTI NIAGA"],
+          ["LAPORAN HASIL PEMINDAIAN BARCODE"],
+          [`Tanggal Scan: ${getFormattedDate()}`],
+          [`Waktu Ekspor Laporan: ${new Date().toLocaleTimeString("id-ID")}`],
+          []
+        ];
+
+        const worksheet = XLSX.utils.aoa_to_sheet(headerInfo);
+        XLSX.utils.sheet_add_json(worksheet, excelData, { origin: "A6" });
+
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Scan");
 
-        XLSX.writeFile(workbook, `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.xlsx`);
-        showToast("📊 Berhasil Mengunduh Excel!");
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+        const defaultFilename = `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.xlsx`;
+        await saveFileWithPicker(blob, defaultFilename, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx");
       }
 
       async function shareExcelFile() {
         const excelData = prepareExcelData(activeViewData);
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        
+        const headerInfo = [
+          ["PT DAYA SAKTI NIAGA"],
+          ["LAPORAN HASIL PEMINDAIAN BARCODE"],
+          [`Tanggal Scan: ${getFormattedDate()}`],
+          [`Waktu Ekspor Laporan: ${new Date().toLocaleTimeString("id-ID")}`],
+          []
+        ];
+
+        const worksheet = XLSX.utils.aoa_to_sheet(headerInfo);
+        XLSX.utils.sheet_add_json(worksheet, excelData, { origin: "A6" });
+
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Scan");
 
@@ -1071,15 +1160,17 @@
             if (err.name !== 'AbortError') alert("Gagal membagikan file.");
           }
         } else {
-          alert("Perangkat ini tidak mendukung kirim file langsung. File akan otomatis diunduh.");
+          alert("Perangkat ini tidak mendukung kirim file langsung. Menampilkan dialog lokasi simpan file...");
           exportToExcel();
         }
       }
 
-      function exportToPDF() {
-        showToast("📄 Membuat file PDF...");
+      async function exportToPDF() {
+        showToast("📄 Memproses File PDF...");
 
         document.getElementById("pdfReportDate").innerText = `Tanggal Laporan: ${getFormattedDate()}`;
+        document.getElementById("pdfReportMeta").innerText = `Waktu Ekspor Laporan: ${new Date().toLocaleTimeString("id-ID")}`;
+
         const pdfTbody = document.getElementById("pdfReportBody");
         pdfTbody.innerHTML = "";
 
@@ -1089,7 +1180,6 @@
             <tr>
               <td align="center">${index + 1}</td>
               <td>${textDisplay}</td>
-              <td align="center">${item.time}</td>
             </tr>
           `;
         });
@@ -1097,24 +1187,32 @@
         const element = document.getElementById("pdfReportTemplate");
         element.style.display = "block";
 
+        const defaultFilename = `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.pdf`;
+
         const opt = {
           margin:       10,
-          filename:     `Laporan_Scan_${getFormattedDate().replace(/ /g, "_")}.pdf`,
+          filename:     defaultFilename,
           image:        { type: 'jpeg', quality: 0.98 },
           html2canvas:  { scale: 2 },
           jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save().then(() => {
+        try {
+          const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
           element.style.display = "none";
-          showToast("📄 Berhasil Mengunduh PDF!");
-        });
+          await saveFileWithPicker(pdfBlob, defaultFilename, "application/pdf", ".pdf");
+        } catch(e) {
+          element.style.display = "none";
+          alert("Gagal memproses file PDF.");
+        }
       }
 
       async function sharePDFFile() {
-        showToast("📄 Memproses PDF untuk dibagikan...");
+        showToast("📄 Memproses PDF untuk WhatsApp...");
 
         document.getElementById("pdfReportDate").innerText = `Tanggal Laporan: ${getFormattedDate()}`;
+        document.getElementById("pdfReportMeta").innerText = `Waktu Ekspor Laporan: ${new Date().toLocaleTimeString("id-ID")}`;
+
         const pdfTbody = document.getElementById("pdfReportBody");
         pdfTbody.innerHTML = "";
 
@@ -1124,7 +1222,6 @@
             <tr>
               <td align="center">${index + 1}</td>
               <td>${textDisplay}</td>
-              <td align="center">${item.time}</td>
             </tr>
           `;
         });
@@ -1154,7 +1251,7 @@
             });
             showToast("🚀 Berhasil Membagikan File PDF!");
           } else {
-            alert("Perangkat ini tidak mendukung kirim file PDF langsung. File akan otomatis diunduh.");
+            alert("Perangkat ini tidak mendukung kirim file PDF langsung. Menampilkan dialog lokasi simpan file...");
             exportToPDF();
           }
         } catch(e) {
